@@ -74,6 +74,8 @@ namespace BGEdit
         }
 
         private bool _isConnected;
+
+        //todo
         public bool IsConnected
         {
             set
@@ -209,16 +211,13 @@ namespace BGEdit
 
         public void connectNodes()
         {
-            Parallel.ForEach(toConnect.Keys,key =>
+            foreach(var key in toConnect.Keys)
             {
                 foreach (var item in toConnect[key])
                 {
                     Connect(key, item);
                 }
-               
-              
-                
-            });
+            }
         }
         public void loadNodes()
         {
@@ -559,9 +558,6 @@ namespace BGEdit
                 bgData.beenTagged.Add(node.Uuid.value, "true");
             }
         }
-
-
-        
         public void AddNode(ConnectorViewModel source, NodeNode node, BG3Data bgData, int x, int y)
         {
             List<String> groupInfostoAdd = new List<String>();
@@ -647,23 +643,14 @@ namespace BGEdit
             addCheckFlags(bgData, node);
 
 
-            //Connect(source, addedNodes[node.Uuid.value].Input[0]);
-            if(!connectionsAdded.ContainsKey(node.Uuid.value)) {
+            //
+            if(!toConnect.ContainsKey(source)) {
 
-                if (toConnect.ContainsKey(source))
-                {
-                    if (toConnect[source] == null)
-                    {
-                        toConnect[source] = new List<ConnectorViewModel>();
-                    }
-                    toConnect[source].Add(addedNodes[node.Uuid.value].Input[0]);
-                }
-                else
-                {
-                    toConnect.Add(source, new List<ConnectorViewModel>());
-                    toConnect[source].Add(addedNodes[node.Uuid.value].Input[0]);
-                }
-                connectionsAdded.Add(node.Uuid.value,true);
+                toConnect.Add(source,new List<ConnectorViewModel>());
+            }
+            if (!toConnect[source].Contains(addedNodes[node.Uuid.value].Input[0]))
+            {
+                toConnect[source].Add(addedNodes[node.Uuid.value].Input[0]);
             }
 
             foreach (var child in node.children)
@@ -674,7 +661,9 @@ namespace BGEdit
                    
                     if (bgData.dialogeNodes.ContainsKey(child2.UUID.value))
                     {
+                       
                         AddNode(addedNodes[node.Uuid.value].Output[0], bgData.dialogeNodes[child2.UUID.value], bgData,++x,y++);
+                      
                     }
                     
                 }
