@@ -4,12 +4,21 @@ using System.IO;
 using System.Xml;
 using Newtonsoft.Json;
 using BGEdit.LocalizationStructur;
-using System.Windows.Shapes;
-using System.Security.Principal;
 using System.Windows;
 
 namespace BGEdit
 {
+    public enum NodeType
+    {
+        Root,
+        Logic,
+        Jump,
+        Question,
+        Answer,
+        AnswerAlias,
+        Group,
+        Unknown
+    }
     //In what context is the data currently?: Later dictionary with every context and switchable if multiple instances are used.
 
     public class BGDataContext
@@ -23,6 +32,16 @@ namespace BGEdit
             currentDialogeNodeUUID = "";
             rootNodeId = "";
             currentSpeakerInDialogeContext.Clear(); 
+        }
+    }
+
+    public class BGDAddedData
+    {
+        public BGDAddedData() { }   
+
+        public void addNode(NodeType type, String[] parentUUID)
+        {
+
         }
     }
     public class BG3Data
@@ -46,6 +65,9 @@ namespace BGEdit
 
         public BGEdit.ConfigStructur.ConfigFile config = new BGEdit.ConfigStructur.ConfigFile();
         //BGEdit.MergedCharsStructure.Save.Region.Node.Children.Node
+
+
+    
         public BG3Data() { }
 
         public String getTagData(String value)
@@ -82,7 +104,7 @@ namespace BGEdit
         //Maybe seperate Tag and Flags
         public void loadTags(String[] tagsPaths)
         {
-
+            
             foreach (String tagPath in tagsPaths) {
                 string[] files = Directory.GetFiles(tagPath);
                 foreach (string file in files)
@@ -298,12 +320,6 @@ namespace BGEdit
             }
             return res;
         }
-
-        public void clearCurrentDialogueData()
-        {
-
-        }
-
         public void loadConfig(String path)
         {
             using StreamReader reader = new(path);
@@ -355,24 +371,6 @@ namespace BGEdit
             
         }
 
-        //Fucky
-        public void searchAndLoadMergedChars(String path)
-        {
-            Console.WriteLine("Searching for merged...");
-            string[] files = Directory.GetFiles(path, "*merged.lsx", SearchOption.AllDirectories);
-            foreach (string file in files) {
-                Console.WriteLine("Found merged: " + file);
-                try
-                {
-                    loadMergedChars(file);
-                }
-                catch (Exception e)
-                {
-                   
-                }
-                
-            }  
-        }
         public void loadData(DataType typeOfData, String path)
         {
             switch (typeOfData)
@@ -398,7 +396,7 @@ namespace BGEdit
                 {
                     NullValueHandling = NullValueHandling.Ignore
                 });
-                //Clipboard.SetText(json);
+                Clipboard.SetText(json);
                 
             }
         }

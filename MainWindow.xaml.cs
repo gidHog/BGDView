@@ -59,8 +59,6 @@ namespace BGEdit
         public ObservableCollection<ConnectorViewModel> Input { get; set; } = new ObservableCollection<ConnectorViewModel>();
         public ObservableCollection<ConnectorViewModel> Output { get; set; } = new ObservableCollection<ConnectorViewModel>();
     }
-
-
     public class ConnectorViewModel : INotifyPropertyChanged
     {
         private Point _anchor;
@@ -75,6 +73,8 @@ namespace BGEdit
         }
 
         private bool _isConnected;
+
+        //todo
         public bool IsConnected
         {
             set
@@ -103,7 +103,6 @@ namespace BGEdit
         public ConnectorViewModel Source { get; set; }
         public ConnectorViewModel Target { get; set; }
     }
-
 
     public interface INodifyCommand : ICommand
     {
@@ -191,8 +190,6 @@ namespace BGEdit
         public ICommand FinishCommand { get; }
     }
 
- 
-
     public class EditorViewModel
     {
         public PendingConnectionViewModel PendingConnection { get; }
@@ -201,30 +198,14 @@ namespace BGEdit
         public Dictionary<string, NodeViewModel> addedNodes = new Dictionary<string, NodeViewModel>();
         public ICommand DisconnectConnectorCommand { get; }
         public Point ViewportLocation { get; set; } = new Point(0d,0d);
-
-        Brush defaultBrush = new SolidColorBrush(Colors.MediumAquamarine);
+        private Brush defaultBrush = new SolidColorBrush(Colors.MediumAquamarine);
+        private Dictionary<ConnectorViewModel, List<ConnectorViewModel>> toConnect = new Dictionary<ConnectorViewModel, List<ConnectorViewModel>>();
 
         BG3Data bgData = new BG3Data();
-
-
-
-        public void loadNodes()
-        {
-            bgData.load();
-            foreach (string key in bgData.dialogeDictionary.Keys)
-            {
-                AddRootNodes(bgData, key, AddSpeakerRootNode("todo"));
-
-            }
-        }
+        
         public EditorViewModel()
         {
-           
-           
-            Console.WriteLine("BGEdit started");
             PendingConnection = new PendingConnectionViewModel(this);
-            
-
             DisconnectConnectorCommand = new DelegateCommand<ConnectorViewModel>(connector =>
             {
                 var connection = Connections.First(x => x.Source == connector || x.Target == connector);
@@ -234,16 +215,30 @@ namespace BGEdit
                 Connections.Remove(connection);
             });
             loadNodes();
-
-
-
             //Connections are a bit much to view
             //addSpeakerNodes(bgData, bgData.currentContext.currentDialogeNodeUUID);
-
-
         }
+        public void connectNodes()
+        {
+            foreach (var key in toConnect.Keys)
+            {
+                foreach (var item in toConnect[key])
+                {
+                    Connect(key, item);
+                }
+            }
+        }
+        public void loadNodes()
+        {
+            bgData.load();
 
-        
+            foreach (string key in bgData.dialogeDictionary.Keys)
+            {
+                AddRootNodes(bgData, key, AddSpeakerRootNode("todo"));
+
+            }
+            connectNodes();
+        }
         public void addSpeakerNodes(BG3Data bgData, string uuidOfSpeakerNode)
         {
             if (bgData.speakerList.ContainsKey(uuidOfSpeakerNode))
@@ -251,11 +246,12 @@ namespace BGEdit
                 Console.WriteLine("Found UUID of Dialoge: " + uuidOfSpeakerNode);
                 foreach (Speaker item in bgData.speakerList[uuidOfSpeakerNode].Values)
                 {
-                    if (!addedNodes.ContainsKey(item.List.value))
+                    var value = item.List.value;
+                    if (!addedNodes.ContainsKey(value))
                     {
-                        addedNodes.Add(item.List.value, new NodeViewModel
+                        addedNodes.Add(value, new NodeViewModel
                         {
-                            Title = "Speaker"+'\n'+item.List.value,
+                            Title = "Speaker"+'\n'+ value,
                             Output = new ObservableCollection<ConnectorViewModel>
                         {
                             new ConnectorViewModel
@@ -264,8 +260,8 @@ namespace BGEdit
                             }
                          }
                         });
-                        Console.WriteLine("Added Speaker"+ item.List.value);
-                        Nodes.Add(addedNodes[item.List.value]);
+                        Console.WriteLine("Added Speaker"+ value);
+                        Nodes.Add(addedNodes[value]);
                         
                     }
                   
@@ -288,17 +284,14 @@ namespace BGEdit
             };
             return SpeakerRootNode;
         }
-        
         public void addTextToNode(List<String> list, String text)
         {
             list.Add(text);
         }
-
         public void AddRootNodes(BG3Data bgData,String key, NodeViewModel SpeakerRootNode)
         {
-            int x = 1, y = 1;
+           
             Nodes.Add(SpeakerRootNode);
-
             foreach (RootNode item in bgData.dialogeDictionary[key].Save.Regions.Dialog.Nodes[0].RootNodes)
             {
                
@@ -325,7 +318,7 @@ namespace BGEdit
                
                 addTextToNode(tmpNode.RootList,item.RootNodes.value);
                 tmpNode.RootsFound = "Visible";
-                y++;
+                
                 foreach (NodeNode node in bgData.dialogeDictionary[key].Save.Regions.Dialog.Nodes[0].Node)
                 {
                     bgData.dialogeNodes[node.Uuid.value] = node;
@@ -353,12 +346,12 @@ namespace BGEdit
                     if (item.RootNodes.value == node.Uuid.value)
                     {
                         //Console.WriteLine(node.Uuid.Value);
-                        AddNode(tmpNode.Output[0],node, bgData,++x,y++);
+                        AddNode(tmpNode.Output[0],node, bgData,0,0);
                          
                         if (bgData.editorData[node.Uuid.value].ContainsKey("position"))
                         {
                             string[] words = bgData.editorData[node.Uuid.value]["position"].Split(';');
-                            int tmpx = 0, tmpy = 0;
+                            double tmpx = 0, tmpy = 0;
                             foreach (string word in words)
                             {
 
@@ -366,11 +359,11 @@ namespace BGEdit
                                 //System.Console.WriteLine(int.Parse(word));
                                 if (tmpx != 0)
                                 {
-                                    tmpy = (int)(int.Parse(word) * 1.3);
+                                    tmpy = int.Parse(word) * 1.3;
                                 }
                                 else
                                 {
-                                    tmpx = (int)(int.Parse(word) * 1.8);
+                                    tmpx = int.Parse(word) * 1.8;
                                 }
 
 
@@ -397,7 +390,6 @@ namespace BGEdit
             }
            
         }
-
         public void addTaggedTexts(BG3Data bgData, NodeNode node, List<String> tagTextToAdd)
         {
             if (node.TaggedTexts != null)
@@ -420,11 +412,11 @@ namespace BGEdit
                                     if (rule2 == null || rule2.Rule == null) continue;
                                     foreach (var rule3 in rule2.Rule)
                                     {
-                                        if (rule2 == null || rule3.Tags == null) continue;
+                                        if (rule3 == null || rule3.Tags == null) continue;
                                         tagTextToAdd.Add("Tag Rule:");
                                         foreach (var rule4 in rule3.Tags)
                                         {
-                                            if (rule2 == null || rule4.Tag == null) continue;
+                                            if (rule4 == null || rule4.Tag == null) continue;
                                             foreach (var rule5 in rule4.Tag)
                                             {
                                                 tagTextToAdd.Add(rule5.Object.Value + " " + bgData.getTagData(rule5.Object.Value + "") + "\n");
@@ -456,36 +448,34 @@ namespace BGEdit
 
         public void addSpeakersToNode(BG3Data bgData, NodeNode node)
         {
-            if (node.Speaker != null)
+            if (node.Speaker != null && !bgData.speakerAdded.ContainsKey(node.Uuid.value))
             {
-                if (!bgData.speakerAdded.ContainsKey(node.Uuid.value))
+                var speakerInfo = "";
+                if (bgData.speakerList[bgData.currentContext.currentDialogeNodeUUID].ContainsKey(node.Speaker.Value + ""))
                 {
-                    var speakerInfo = "";
-                    if (bgData.speakerList[bgData.currentContext.currentDialogeNodeUUID].ContainsKey(node.Speaker.Value + ""))
-                    {
-                        speakerInfo += bgData.getSpeakerInfo(bgData.speakerList[bgData.currentContext.currentDialogeNodeUUID][node.Speaker.Value + ""].List.value);
-                    }
-
-                    //var speakerConnector = new ConnectorViewModel { Title = "Speaker:" + node.Speaker.Value +" "+ speakerInfo };
-                    //addedNodes[node.Uuid.Value].Input.Add(speakerConnector);
-                    addTextToNode(addedNodes[node.Uuid.value].SpeakerList, "Speaker: " + node.Speaker.Value);
-                    addTextToNode(addedNodes[node.Uuid.value].SpeakerList, "Speaker Info: " + speakerInfo);
-                    addedNodes[node.Uuid.value].SpeakersFound = "Visible";
-                    bgData.speakerAdded.Add(node.Uuid.value, "True");
-
-                    //Console.WriteLine("Current Searched Speaker"+node.Speaker.Value);
-
-                    foreach (Speaker item in bgData.speakerList[bgData.currentContext.currentDialogeNodeUUID].Values)
-                    {
-                        if (item.Index.value == (node.Speaker.Value + ""))
-                        {
-                            //makes it very messy todo : combine Lines?
-                            //Connect(addedNodes[item.List.Value].Output[0], speakerConnector);
-                        }
-                    }
+                    speakerInfo += bgData.getSpeakerInfo(bgData.speakerList[bgData.currentContext.currentDialogeNodeUUID][node.Speaker.Value + ""].List.value);
                 }
 
+                //var speakerConnector = new ConnectorViewModel { Title = "Speaker:" + node.Speaker.Value +" "+ speakerInfo };
+                //addedNodes[node.Uuid.Value].Input.Add(speakerConnector);
+                addTextToNode(addedNodes[node.Uuid.value].SpeakerList, "Speaker: " + node.Speaker.Value);
+                addTextToNode(addedNodes[node.Uuid.value].SpeakerList, "Speaker Info: " + speakerInfo);
+                addedNodes[node.Uuid.value].SpeakersFound = "Visible";
+                bgData.speakerAdded.Add(node.Uuid.value, "True");
+
+                //Console.WriteLine("Current Searched Speaker"+node.Speaker.Value);
+
+                /*foreach (Speaker item in bgData.speakerList[bgData.currentContext.currentDialogeNodeUUID].Values)
+                {
+                    if (item.Index.value == (node.Speaker.Value + ""))
+                    {
+                        //makes it very messy todo : combine Lines?
+                        //Connect(addedNodes[item.List.Value].Output[0], speakerConnector);
+                    }
+                }*/
             }
+
+            
         }
         public void addCheckFlags(BG3Data bgData, NodeNode node)
         {
@@ -547,10 +537,6 @@ namespace BGEdit
                 bgData.beenTagged.Add(node.Uuid.value, "true");
             }
         }
-
-
-
-
         public void AddNode(ConnectorViewModel source, NodeNode node, BG3Data bgData, int x, int y)
         {
             List<String> groupInfostoAdd = new List<String>();
@@ -636,7 +622,16 @@ namespace BGEdit
             addCheckFlags(bgData, node);
 
 
-            Connect(source, addedNodes[node.Uuid.value].Input[0]);
+            //
+            if(!toConnect.ContainsKey(source)) {
+
+                toConnect.Add(source,new List<ConnectorViewModel>());
+            }
+            if (!toConnect[source].Contains(addedNodes[node.Uuid.value].Input[0]))
+            {
+                toConnect[source].Add(addedNodes[node.Uuid.value].Input[0]);
+            }
+
             foreach (var child in node.children)
             {
                 if(child == null || child.children == null) continue; //Trashy stop
@@ -645,7 +640,9 @@ namespace BGEdit
                    
                     if (bgData.dialogeNodes.ContainsKey(child2.UUID.value))
                     {
+                       
                         AddNode(addedNodes[node.Uuid.value].Output[0], bgData.dialogeNodes[child2.UUID.value], bgData,++x,y++);
+                      
                     }
                     
                 }
@@ -655,18 +652,7 @@ namespace BGEdit
 
         }
         
-
-        public enum NodeType
-        {
-            Root,
-            Logic,
-            Jump,
-            Question,
-            Answer,
-            AnswerAlias,
-            Group,
-            Unknown
-        }
+   
         public NodeViewModel createNode(NodeType type)
         {
             switch (type)
@@ -692,7 +678,6 @@ namespace BGEdit
             }
             return null;
         }
-
         public Brush colorNode(NodeNode node, BG3Data bgData)
         {
             Brush color = new SolidColorBrush(Colors.DimGray);
@@ -751,12 +736,5 @@ namespace BGEdit
             }
             Connections.Add(connection);
         }
-
-
-        public void clearCurrentNodes(BG3Data bgData)
-        {
-            bgData.clearCurrentDialogueData();
-        }
-
     }
 }
