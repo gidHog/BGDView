@@ -39,7 +39,7 @@ UnpackedData/
 1. This is a early and incomplete version, things may not work or be displayed incorrect (some .lsj loop)
 2. Loading takes longer with Windows-Defender enabled
 3. The code is currently horrendous 
-4. The "RootNode" is currently at x = 0 y = 0
+
 
 
 ## Examples (fragments)

@@ -197,7 +197,7 @@ namespace BGEdit
         public ObservableCollection<ConnectionViewModel> Connections { get; } = new ObservableCollection<ConnectionViewModel>();
         public Dictionary<string, NodeViewModel> addedNodes = new Dictionary<string, NodeViewModel>();
         public ICommand DisconnectConnectorCommand { get; }
- 
+        public Point ViewportLocation { get; set; } = new Point(0d,0d);
         public ICommand AddEditorCommand { get; }
         BG3Data bgData = new BG3Data();
 
@@ -374,7 +374,8 @@ namespace BGEdit
                             if (tmpx != 0 && tmpy != 0)
                             {
                                 tmpNode.Location = new Point(tmpx-256, tmpy);
-                                //SpeakerRootNode.Location = new Point(tmpx - 512, tmpy-128);
+                                SpeakerRootNode.Location = new Point(tmpx - 512, tmpy-128);
+                                ViewportLocation = new Point(tmpx - 512, tmpy - 128);
                             }
                         }
                     }
