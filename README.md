@@ -38,26 +38,25 @@ UnpackedData/
 
 1. This is a early and incomplete version, things may not work or be displayed incorrect (some .lsj loop)
 2. Loading takes longer with Windows-Defender enabled
-3. The Code is currently horrendous 
-4. The RootNode is currently at x = 0 y = 0
+3. The code is currently horrendous 
+4. The "RootNode" is currently at x = 0 y = 0
 
 
 ## Examples (fragments)
 
-
 <details>
-  <summary>[Spoiler warning](Astarion_InParty2.lsj))</summary>
-  Change in the Config: "RelativeDialoguePath" : {"path" :"Gustav\\Mods\\GustavDev\\Story\\Dialogs\\Companions\\Astarion_InParty2.lsj"},<br> 
-  Some fragments of "Astarion_InParty2.lsj":<br> 
- (https://github.com/gidHog/BGDView/assets/64482285/72e309c0-f394-4863-9ee6-490808d1c70a)<br> 
- (https://github.com/gidHog/BGDView/assets/64482285/7fc11908-c121-4816-8d3d-a433a75344c4)<br> 
+	<summary>[Spoiler warning](Astarion_InParty2.lsj))</summary>
+	Change in "Config.json": "RelativeDialoguePath" : {"path" :"Gustav\\Mods\\GustavDev\\Story\\Dialogs\\Companions\\Astarion_InParty2.lsj"},<br> 
+	Some fragments of "Astarion_InParty2.lsj":<br> 
+	<img src="https://github.com/gidHog/BGDView/assets/64482285/25c3c8a7-2c7a-499e-9fb4-aa66762f020a"><br>
+	<img src="https://github.com/gidHog/BGDView/assets/64482285/bf1fa8a8-aea6-4d34-8855-d1f31f02ff44"><br>
+
 
 </details>
 
 <details>
-  <summary>[Spoiler warning](DEN_HagTrader.lsj)))</summary>
-  Change in the Config: "RelativeDialoguePath" : {"path" :"Gustav\\Mods\\Gustav\\Story\\Dialogs\\Act1\\DEN\\DEN_HagTrader.lsj"},<br> 
-  (https://github.com/gidHog/BGDView/assets/64482285/2c2bcd44-ae40-4b5a-a4a7-d4582cd42461)<br> 
+	<summary>[Spoiler warning](DEN_HagTrader.lsj)))</summary>
+	Change in "Config.json": "RelativeDialoguePath" : {"path" :"Gustav\\Mods\\Gustav\\Story\\Dialogs\\Act1\\DEN\\DEN_HagTrader.lsj"},<br> 
+	<img src="https://github.com/gidHog/BGDView/assets/64482285/c37d508d-5a59-41ae-91b4-77383d53ccc0">
 </details>
-
 
