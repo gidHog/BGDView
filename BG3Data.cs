@@ -398,7 +398,7 @@ namespace BGEdit
                 {
                     NullValueHandling = NullValueHandling.Ignore
                 });
-                Clipboard.SetText(json);
+                //Clipboard.SetText(json);
                 
             }
         }
