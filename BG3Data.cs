@@ -7,6 +7,7 @@ using BGEdit.LocalizationStructur;
 using System.Windows.Shapes;
 using System.Security.Principal;
 using System.Windows;
+using System.Threading.Tasks;
 
 namespace BGEdit
 {
@@ -82,7 +83,7 @@ namespace BGEdit
         //Maybe seperate Tag and Flags
         public void loadTags(String[] tagsPaths)
         {
-
+            
             foreach (String tagPath in tagsPaths) {
                 string[] files = Directory.GetFiles(tagPath);
                 foreach (string file in files)
@@ -398,7 +399,7 @@ namespace BGEdit
                 {
                     NullValueHandling = NullValueHandling.Ignore
                 });
-                //Clipboard.SetText(json);
+                Clipboard.SetText(json);
                 
             }
         }

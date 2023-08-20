@@ -183,8 +183,28 @@ namespace BGEdit
         [JsonProperty("data")]
         public EditorDataNodeData[] Data { get; set; }
     }
+
+    public partial class SpeakerLinkingEntries
+    {
+        [JsonProperty("SpeakerLinkingEntry")]
+        public SpeakerLinkingEntry[] SpeakerLinkingEntry { get; set; }
+    }
+
+    public partial class SpeakerLinkingEntry
+    {
+        [JsonProperty("Key")]
+        public TypeValPairInt32 key { get; set; }
+        [JsonProperty("Value")]
+        public TypeValPairInt32 value { get; set; }
+    }
+
     public partial class NodeNode
     {
+        
+        public TypeValPairStr NestedDialogNodeUUID { get; set; }
+
+        [JsonProperty("SpeakerLinking")]
+        SpeakerLinkingEntries[] SpeakerLinking { get; set; }
         [JsonProperty("GameData")]
         public GameDatum[] GameData { get; set; }
         [JsonProperty("GroupID")]
@@ -213,9 +233,7 @@ namespace BGEdit
         [JsonProperty("editorData")]
         public EditorDataNode[] EditorData { get; set; }
 
-        [JsonProperty("setflags")]
-        public Flags[] Setflags { get; set; }
-
+     
 
         [JsonProperty("speaker")]
         public NextNodeId Speaker { get; set; }
@@ -228,7 +246,9 @@ namespace BGEdit
         [JsonProperty("endnode")]
         public IsAllowingJoinCombat Endnode { get; set; }
 
-    
+        [JsonProperty("setflags")]
+        public Flags[] Setflags { get; set; }
+
 
     }
 
