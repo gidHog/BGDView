@@ -48,15 +48,14 @@ UnpackedData/
 	<summary>[Spoiler warning](Astarion_InParty2.lsj))</summary>
 	Change in "Config.json": "RelativeDialoguePath" : {"path" :"Gustav\\Mods\\GustavDev\\Story\\Dialogs\\Companions\\Astarion_InParty2.lsj"},<br> 
 	Some fragments of "Astarion_InParty2.lsj":<br> 
-	<img src="https://github.com/gidHog/BGDView/assets/64482285/25c3c8a7-2c7a-499e-9fb4-aa66762f020a"><br>
-	<img src="https://github.com/gidHog/BGDView/assets/64482285/bf1fa8a8-aea6-4d34-8855-d1f31f02ff44"><br>
-
+	<img src="https://github.com/gidHog/BGDView/assets/64482285/62cbc2d2-1704-49d1-a11b-948c7da54bf1"><br>
+	<img src="https://github.com/gidHog/BGDView/assets/64482285/b7c7a0c5-1c6e-473c-9025-feb78362d8a2"><br>
 
 </details>
 
 <details>
 	<summary>[Spoiler warning](DEN_HagTrader.lsj)))</summary>
 	Change in "Config.json": "RelativeDialoguePath" : {"path" :"Gustav\\Mods\\Gustav\\Story\\Dialogs\\Act1\\DEN\\DEN_HagTrader.lsj"},<br> 
-	<img src="https://github.com/gidHog/BGDView/assets/64482285/c37d508d-5a59-41ae-91b4-77383d53ccc0">
+	<img src="https://github.com/gidHog/BGDView/assets/64482285/1efa2e13-9f21-48f2-bb2c-a1e54b87f3c9">
 </details>
 
