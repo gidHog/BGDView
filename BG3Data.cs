@@ -5,6 +5,8 @@ using System.Xml;
 using Newtonsoft.Json;
 using BGEdit.LocalizationStructur;
 using System.Windows.Shapes;
+using System.Security.Principal;
+using System.Windows;
 
 namespace BGEdit
 {
@@ -77,7 +79,6 @@ namespace BGEdit
             }
             return res;
         }
-
         //Maybe seperate Tag and Flags
         public void loadTags(String[] tagsPaths)
         {
@@ -172,13 +173,12 @@ namespace BGEdit
             using StreamReader reader = new(path);
             var json = reader.ReadToEnd();
             DialogueStructurRoot DialogueStructurRoot = DialogueStructurRoot.FromJson(json);
-            dialogeDictionary.Add(DialogueStructurRoot.Save.Regions.Dialog.Speakerlist[0].Speaker[0].SpeakerMappingId.Value, DialogueStructurRoot);
-            Console.WriteLine(DialogueStructurRoot.Save.Regions.Dialog.Speakerlist[0].Speaker[0].SpeakerMappingId.Value);
+            dialogeDictionary.Add(DialogueStructurRoot.Save.Regions.Dialog.Speakerlist[0].Speaker[0].SpeakerMappingId.value, DialogueStructurRoot);
+            Console.WriteLine(DialogueStructurRoot.Save.Regions.Dialog.Speakerlist[0].Speaker[0].SpeakerMappingId.value);
             Console.WriteLine(DialogueStructurRoot.Save.Regions.Dialog.Nodes[0].RootNodes.Length);
-            loadSpeakers(DialogueStructurRoot.Save.Regions.Dialog.Uuid.Value,DialogueStructurRoot);
-            currentContext.currentDialogeNodeUUID = DialogueStructurRoot.Save.Regions.Dialog.Uuid.Value;
+            loadSpeakers(DialogueStructurRoot.Save.Regions.Dialog.Uuid.value,DialogueStructurRoot);
+            currentContext.currentDialogeNodeUUID = DialogueStructurRoot.Save.Regions.Dialog.Uuid.value;
         }
-
         //UUID
         public void loadSpeakers(String uuidnode, DialogueStructurRoot dialoge)
         {
@@ -192,19 +192,18 @@ namespace BGEdit
             {
                 foreach (Speaker item2 in item.Speaker)
                 {
-                    if (speakerList[uuidnode].ContainsKey(item2.List.Value))
+                    if (speakerList[uuidnode].ContainsKey(item2.List.value))
                     {
-                        speakerList[uuidnode][item2.List.Value] =  item2;
+                        speakerList[uuidnode][item2.List.value] =  item2;
                     }
                     else
                     {
-                        speakerList[uuidnode].Add(item2.Index.Value, item2);
-                        Console.WriteLine("Added Speaker: "+item2.List.Value);
+                        speakerList[uuidnode].Add(item2.Index.value, item2);
+                        Console.WriteLine("Added Speaker: "+item2.List.value);
                     }
                 }
             }
         }
-
 
         //Mapkey
         public void loadMergedChars(String path)
@@ -297,18 +296,8 @@ namespace BGEdit
             {
                 res += uuid + " :Not found";
             }
-
-           
-           
-
-           
-            
-
-
             return res;
         }
-
-
 
         public void clearCurrentDialogueData()
         {
@@ -353,8 +342,9 @@ namespace BGEdit
                     }
                     loadOrigins(rootFolder + config.Config.RelativeOriginsPath.Path);
                 }
+                serializeData();
 
-                        
+
             }
             catch (Exception e)
             {
@@ -396,6 +386,19 @@ namespace BGEdit
                 case DataType.MergedChars:
                     loadMergedChars(path);
                     break;
+                
+            }
+        }
+    
+        public void serializeData()
+        {
+            foreach (var item in dialogeDictionary.Values)
+            {
+                string json = JsonConvert.SerializeObject(item, Newtonsoft.Json.Formatting.Indented, new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                });
+                Clipboard.SetText(json);
                 
             }
         }

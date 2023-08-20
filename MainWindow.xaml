@@ -127,6 +127,16 @@
                                     </ItemsControl.ItemsPanel>
                                 </ItemsControl>
                             </Border>
+                            <Border Background="Transparent" BorderBrush="White" BorderThickness="1" Visibility="{Binding TagsToSetFound}">
+                                <ItemsControl ItemsSource="{Binding TagSetList}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
+                                            <StackPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Border>
                             <Border Background="Transparent" BorderBrush="White" BorderThickness="1" Visibility="{Binding SpeakersFound}">
                                 <ItemsControl ItemsSource="{Binding SpeakerList}">
                                     <ItemsControl.ItemsPanel>

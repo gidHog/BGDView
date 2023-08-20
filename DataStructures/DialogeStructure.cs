@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
+using BGEdit.GenericStructures;
 // <partial auto-generated/>
 namespace BGEdit
 {
@@ -48,16 +48,16 @@ namespace BGEdit
         public IsAllowingJoinCombat IsAllowingJoinCombat { get; set; }
 
         [JsonProperty("TimelineId")]
-        public TimelineId TimelineId { get; set; }
+        public TypeValPairStr TimelineId { get; set; }
 
         [JsonProperty("UUID")]
-        public TimelineId Uuid { get; set; }
+        public TypeValPairStr Uuid { get; set; }
 
         [JsonProperty("automated")]
-        public IsAllowingJoinCombat Automated { get; set; }
+        public TypeValPairBool Automated { get; set; }
 
         [JsonProperty("category")]
-        public TimelineId Category { get; set; }
+        public TypeValPairStr Category { get; set; }
 
         [JsonProperty("nodes")]
         public DialogNode[] Nodes { get; set; }
@@ -146,10 +146,11 @@ namespace BGEdit
     public partial class Flag
     {
         [JsonProperty("UUID")]
-        public UUID UUID { get; set; }
-
+        public TypeValPairStr UUID { get; set; }
+        [JsonProperty("paramval")]
+        public TypeValPairInt32 paramval { get; set; }
         [JsonProperty("value")]
-        public Value value { get; set; }
+        public TypeValPairBool value { get; set; }
     }
 
     public partial class FlaggroupType
@@ -169,53 +170,66 @@ namespace BGEdit
         public bool value { get; set; }
     }
 
+    public partial class EditorDataNodeData
+    {
+        [JsonProperty("key")]
+        public TypeValPairStr Key { get; set; }
+
+        [JsonProperty("val")]
+        public TypeValPairStr Val { get; set; }
+    }
+    public partial class EditorDataNode
+    {
+        [JsonProperty("data")]
+        public EditorDataNodeData[] Data { get; set; }
+    }
     public partial class NodeNode
     {
+        [JsonProperty("GameData")]
+        public GameDatum[] GameData { get; set; }
+        [JsonProperty("GroupID")]
+        public TypeValPairStr GroupID { get; set; }
+        [JsonProperty("GroupIndex")]
+        public TypeValPairInt32 GroupIndex { get; set; }
+
+        [JsonProperty("TaggedTexts")]
+        public NodeTaggedText[] TaggedTexts { get; set; }
+        [JsonProperty("Tags")]
+        public DefaultAddressedSpeaker[] Tags { get; set; }
+        [JsonProperty("UUID")]
+        public TypeValPairStr Uuid { get; set; }
+
+
         [JsonProperty("checkflags")]
         public Checkflag[] Checkflags { get; set; }
 
-        [JsonProperty("GameData")]
-        public GameDatum[] GameData { get; set; }
+        [JsonProperty("children")]
+        public Children[] children { get; set; }
 
+        [JsonProperty("constructor")]
+        public TypeValPairStr Constructor { get; set; }
+
+
+        [JsonProperty("editorData")]
+        public EditorDataNode[] EditorData { get; set; }
+
+        [JsonProperty("setflags")]
+        public Flags[] Setflags { get; set; }
+
+
+        [JsonProperty("speaker")]
+        public NextNodeId Speaker { get; set; }
         [JsonProperty("jumptarget")]
         public Jumptarget Jumptarget { get; set; }
 
         [JsonProperty("Root")]
         public IsAllowingJoinCombat Root { get; set; }
 
-        [JsonProperty("TaggedTexts")]
-        public NodeTaggedText[] TaggedTexts { get; set; }
-
-        [JsonProperty("Tags")]
-        public DefaultAddressedSpeaker[] Tags { get; set; }
-
-        [JsonProperty("UUID")]
-        public TimelineId Uuid { get; set; }
-
-
-        [JsonProperty("GroupID")]
-        public TimelineId GroupID { get; set; }
-
-        [JsonProperty("GroupIndex")]
-        public TimelineId GroupIndex { get; set; }
-
-        [JsonProperty("children")]
-        public Children[] children { get; set; }
-
-        [JsonProperty("constructor")]
-        public TimelineId Constructor { get; set; }
-
-        [JsonProperty("editorData")]
-        public DefaultAttitude[] EditorData { get; set; }
-
         [JsonProperty("endnode")]
         public IsAllowingJoinCombat Endnode { get; set; }
 
-        [JsonProperty("setflags")]
-        public DefaultAddressedSpeaker[] Setflags { get; set; }
+    
 
-        [JsonProperty("speaker")]
-        public NextNodeId Speaker { get; set; }
     }
 
     public partial class DefaultAttitude
@@ -375,7 +389,7 @@ namespace BGEdit
     public partial class RootNode
     {
         [JsonProperty("RootNodes")]
-        public TimelineId RootNodes { get; set; }
+        public TypeValPairStr RootNodes { get; set; }
     }
 
     public partial class Speakerlist
@@ -387,25 +401,61 @@ namespace BGEdit
     public partial class Speaker
     {
         [JsonProperty("SpeakerMappingId")]
-        public TimelineId SpeakerMappingId { get; set; }
+        public TypeValPairStr SpeakerMappingId { get; set; }
 
         [JsonProperty("index")]
-        public TimelineId Index { get; set; }
+        public TypeValPairStr Index { get; set; }
 
         [JsonProperty("list")]
-        public TimelineId List { get; set; }
+        public TypeValPairStr List { get; set; }
     }
 
+
+    public partial class FlagCombinationData
+    {
+        [JsonProperty("key")]
+        public TypeValPairStr key { get; set; }    
+        [JsonProperty("val")]
+        public TypeValPairStr val { get; set; }
+    }
+    public partial class FlagCombinationFlags
+    {
+        [JsonProperty("flaggroup")]
+        public Flaggroup[] flaggroup { get; set; }
+    }
+
+    public partial class Flags
+    {
+        [JsonProperty("flaggroup")]
+        public Flaggroup[] flaggroup { get; set; }
+    }
+    public partial class FlagCombination
+    {
+        [JsonProperty("data")]
+        public FlagCombinationData[] data { get; set; }
+
+        [JsonProperty("flags")]
+        public Flags[] flags { get; set; }
+    }
+    public partial class FlagCombinations
+    {
+        [JsonProperty("flagCombination")]
+        public FlagCombination[] flagCombinations { get; set; }
+    }
+ 
     public partial class EditorData
     {
         [JsonProperty("HowToTrigger")]
-        public TimelineId HowToTrigger { get; set; }
+        public TypeValPairStr HowToTrigger { get; set; }
 
         [JsonProperty("defaultAttitudes")]
         public DefaultAttitude[] DefaultAttitudes { get; set; }
 
         [JsonProperty("defaultEmotions")]
         public DefaultAttitude[] DefaultEmotions { get; set; }
+
+        [JsonProperty("ignoreInvalidFlagCombinations")]
+        public FlagCombinations[] FlagCombination { get; set; }
 
         [JsonProperty("isImportantForStagings")]
         public DefaultAttitude[] IsImportantForStagings { get; set; }
@@ -414,16 +464,16 @@ namespace BGEdit
         public DefaultAttitude[] IsPeanuts { get; set; }
 
         [JsonProperty("needLayout")]
-        public IsAllowingJoinCombat NeedLayout { get; set; }
+        public TypeValPairBool NeedLayout { get; set; }
 
         [JsonProperty("nextNodeId")]
-        public NextNodeId NextNodeId { get; set; }
+        public TypeValPairUInt32 NextNodeId { get; set; }
 
         [JsonProperty("speakerSlotDescription")]
         public DefaultAttitude[] SpeakerSlotDescription { get; set; }
 
         [JsonProperty("synopsis")]
-        public TimelineId Synopsis { get; set; }
+        public TypeValPairStr Synopsis { get; set; }
     }
 
     public enum TypeEnum { FixedString, Guid, LsString };
