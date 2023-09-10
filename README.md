@@ -1,5 +1,5 @@
 # How to
-1. Extract all data with [BG3-Modders-Multitool](https://github.com/ShinyHobo/BG3-Modders-Multitool/releases)
+1. Extract all data with [BG3-Modders-Multitool](https://github.com/ShinyHobo/BG3-Modders-Multitool/releases) (unpack & decompress)
 2. The following folder structure is needed ("UnpackedData" name and path can be changed in the config):
 ```
 BGEdit.exe
