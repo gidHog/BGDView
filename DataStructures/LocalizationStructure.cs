@@ -1,19 +1,9 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BGEdit.LocalizationStructur
 {
-    public enum DataType
-    {
-        Localization,
-        Dialog,
-        MergedChars
-    }
-    // Localization XML
     public class Content
     {
         [JsonProperty("@contentuid")]

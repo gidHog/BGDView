@@ -6,16 +6,15 @@
         xmlns:nodify="https://miroiu.github.io/nodify"
         xmlns:local="clr-namespace:BGEdit"
         mc:Ignorable="d"
-        Title="BGDView v0.0.1" Height="450" Width="800">
+        Title="BGDView v0.1.0" Height="450" Width="800">
     <!-- Set 
-        <Window.DataContext>
-            <local:EditorViewModel
-        </Window.DataContext>
+    
         <Window.InputBindings>
             <KeyBinding Key="R" Command="{Binding ReloadConfig}"/>
         
         </Window.InputBindings>
      -->
+
     <Window.Resources>
         <GeometryDrawing x:Key="SmallGridGeometry"
                         Geometry="M0,0 L0,1 0.03,1 0.03,0.03 1,0.03 1,0 Z"
@@ -42,18 +41,19 @@
     </Window.Resources>
 
 
-  
-
-
     <Grid>
-
-        <nodify:NodifyEditor ViewportLocation="{Binding ViewportLocation}"  ItemsSource="{Binding Nodes}"  Connections="{Binding Connections}" PendingConnection="{Binding PendingConnection}" DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}" >
-            <!-- Set Context -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <nodify:NodifyEditor Grid.RowSpan="3" ViewportLocation="{Binding ViewportLocation}"  ItemsSource="{Binding Nodes}"  Connections="{Binding Connections}" PendingConnection="{Binding PendingConnection}" DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}">
+            <!-- Set context -->
             <nodify:NodifyEditor.DataContext>
                 <local:EditorViewModel />
             </nodify:NodifyEditor.DataContext>
            
-            <!-- Connection-Templates for the Edítor -->
+            <!-- Connection-Templates for the edítor -->
             <nodify:NodifyEditor.ConnectionTemplate>
                 <DataTemplate DataType="{x:Type local:ConnectionViewModel}">
                     <nodify:LineConnection Source="{Binding Source.Anchor}"
@@ -61,7 +61,7 @@
                 </DataTemplate>
             </nodify:NodifyEditor.ConnectionTemplate>
             
-            <!-- Handle pending Connection -->
+            <!-- Handle pending connection -->
             <nodify:NodifyEditor.PendingConnectionTemplate>
                 <DataTemplate DataType="{x:Type local:PendingConnectionViewModel}">
                     <nodify:PendingConnection StartedCommand="{Binding StartCommand}"
@@ -69,20 +69,32 @@
                                       AllowOnlyConnectors="True" />
                 </DataTemplate>
             </nodify:NodifyEditor.PendingConnectionTemplate>
-
-            <!-- Style for Node -->
+           
+            <!-- Style for node -->
             <nodify:NodifyEditor.ItemContainerStyle>
                 <Style TargetType="{x:Type nodify:ItemContainer}">
                     <Setter Property="Location" 
                     Value="{Binding Location}" />
                 </Style>
             </nodify:NodifyEditor.ItemContainerStyle>
-            <!-- Node-Templates for the Edítor -->
+            <!-- Node-Templates for the edítor -->
             <nodify:NodifyEditor.ItemTemplate>
                 <DataTemplate DataType="{x:Type local:NodeViewModel}" >
-                    <!-- NodeViewModel is the reference Name of the Node-->
-                    <nodify:Node Header="{Binding Title}"  Input="{Binding Input}" Output="{Binding Output}" HeaderBrush="{Binding HeaderBrushColor}" >
+                    <!-- NodeViewModel is the reference name of the node-->
+                    <nodify:Node Input="{Binding Input}" Output="{Binding Output}" HeaderBrush="{Binding HeaderBrushColor}" >
 
+                        <nodify:Node.Header>
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Width="Auto">
+                                    <TextBox Text="{Binding Type, UpdateSourceTrigger=PropertyChanged}" Background="{Binding HeaderBrushColor}" TextAlignment="Center"></TextBox>
+                                    
+                                    <TextBox Text="{Binding Title}" Background="{Binding HeaderBrushColor}" TextAlignment="Center"></TextBox>
+                                    <TextBox Text="{Binding UUID}" Background="{Binding HeaderBrushColor}" IsReadOnly="True" TextAlignment="Center"></TextBox>
+                                  
+                                </StackPanel>
+                                <Button Command="{Binding AddChildren}">Add Children</Button>
+                            </StackPanel>
+                        </nodify:Node.Header>
                         <nodify:Node.InputConnectorTemplate>
 
                             <DataTemplate DataType="{x:Type local:ConnectorViewModel}">
@@ -95,13 +107,14 @@
                             <DataTemplate DataType="{x:Type local:ConnectorViewModel}">
                                 <nodify:NodeOutput Header="{Binding Title}" IsConnected="{Binding IsConnected}" Anchor="{Binding Anchor, Mode=OneWayToSource}"/>
                             </DataTemplate>
+                            
                         </nodify:Node.OutputConnectorTemplate>
+                        
                         <StackPanel>
                             <Border Background="Transparent" BorderBrush="White" BorderThickness="1" Visibility="{Binding RootsFound}">
                                 <ItemsControl ItemsSource="{Binding RootList}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
                                             <StackPanel/>
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
@@ -111,7 +124,6 @@
                                 <ItemsControl ItemsSource="{Binding GroupList}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
                                             <StackPanel/>
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
@@ -121,7 +133,6 @@
                                 <ItemsControl ItemsSource="{Binding TagList}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
                                             <StackPanel/>
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
@@ -131,7 +142,6 @@
                                 <ItemsControl ItemsSource="{Binding TagSetList}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
                                             <StackPanel/>
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
@@ -141,7 +151,6 @@
                                 <ItemsControl ItemsSource="{Binding SpeakerList}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
                                             <StackPanel/>
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
@@ -152,7 +161,6 @@
                                 <ItemsControl ItemsSource="{Binding TagTextList}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
                                             <StackPanel/>
 
 
@@ -160,28 +168,133 @@
 
                                     </ItemsControl.ItemsPanel>
                                 </ItemsControl>
-                              
                             </Border>
+
+                            <Expander Name="Attributes" Background="MintCream" HorizontalAlignment="Stretch" Header="Attributes" ExpandDirection="Down" IsExpanded="False" BorderBrush="Gray">
+
+                                <StackPanel>
+                                    <CheckBox BorderBrush="Gray" IsChecked="{Binding RootCheckbox}">RootNode</CheckBox>
+                                    <CheckBox BorderBrush="Gray" IsChecked="{Binding EndCheckbox}">EndNode</CheckBox>
+                                    <CheckBox BorderBrush="Gray" IsChecked="{Binding OptionalCheckbox}">optional</CheckBox>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock>PopLevel</TextBlock>
+                                        <TextBox BorderBrush="Gray" Text="{Binding PopLevel}"></TextBox>
+                                    </StackPanel>
+                                    
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Background="Beige">GroupID</TextBlock>
+                                        <TextBox Background="Beige" BorderBrush="Gray" Text="{Binding GroupID}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Background="Beige">GroupIndex</TextBlock>
+                                        <TextBox Background="Beige" BorderBrush="Gray" Text="{Binding GroupIndex}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Background="Beige">UUID</TextBlock>
+                                        <TextBox Background="Beige" BorderBrush="Gray" Text="{Binding UUID}" IsReadOnly="True"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Background="Beige">constructor</TextBlock>
+                                        <TextBox Background="Beige" BorderBrush="Gray" Text="{Binding Constructor}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Background="Beige">speaker</TextBlock>
+                                        <TextBox Background="Beige" BorderBrush="Gray" Text="{Binding Speaker}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Background="Beige">TaggedTexts</TextBlock>
+                                        <Expander  Name="Tags" Background="Beige" HorizontalAlignment="Stretch" Header="Tags" ExpandDirection="Down" IsExpanded="False" BorderBrush="Gray">
+                                        <!-- Tags-->
+                                            <StackPanel>
+                                                <ItemsControl ItemsSource="{Binding TaggedTextDataEditable}" >
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
+                                                            <StackPanel/>
+
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                </ItemsControl>
+                                                <!-- <Button Command="{Binding AddEditorData}">Add editordata</Button>-->
+                                            </StackPanel>
+                                        </Expander>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Background="Beige">checkflags</TextBlock>
+                                        <Expander  Name="checkflags" Background="Beige" HorizontalAlignment="Stretch" Header="checkflags" ExpandDirection="Down" IsExpanded="False" BorderBrush="Gray">
+                                        <!-- checkFlags-->
+                                            <StackPanel>
+                                                <ItemsControl ItemsSource="{Binding CheckFlagEditable}" >
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <!-- The default for an ItemsControl is a StackPanel with a vertical orientation -->
+                                                            <StackPanel/>
+
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                </ItemsControl>
+                                                <Button Command="{Binding AddCheckFlag}">Add Tag</Button>
+                                            </StackPanel>
+                                        </Expander>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Background="Beige">setflags</TextBlock>
+                                        <Expander  Name="setflags" Background="Beige" HorizontalAlignment="Stretch" Header="setflags" ExpandDirection="Down" IsExpanded="False" BorderBrush="Gray">
+                                            <StackPanel>
+                                                <ItemsControl ItemsSource="{Binding SetFlagEditable}" >
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <StackPanel/>
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                </ItemsControl>
+                                                <Button Command="{Binding AddSetFlag}">Add Tag</Button>
+                                            </StackPanel>    
+                                        </Expander>
+                                    </StackPanel>
+                                    <Expander Name="GameData" Background="MintCream" HorizontalAlignment="Stretch" Header="GameData" ExpandDirection="Down" IsExpanded="False" BorderBrush="Gray">
+                                    </Expander>
+                                    <Expander Name="editorData" Background="MintCream" HorizontalAlignment="Stretch" Header="editorData" ExpandDirection="Down" IsExpanded="False" BorderBrush="Gray">
+                                        <StackPanel>
+                                            <ItemsControl ItemsSource="{Binding EditorDataEditable}" >
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                            </ItemsControl>
+                                            <Button Command="{Binding AddEditorData}">Add editordata</Button>
+                                        </StackPanel>
+                                    </Expander>
+                                </StackPanel>
+                            </Expander>
+
                         </StackPanel>
-       
-
-
                     </nodify:Node>
                 </DataTemplate>
 
     
             </nodify:NodifyEditor.ItemTemplate>
-        
-
-
-
-
-
         </nodify:NodifyEditor>
-        <!-- Set
-        <Expander Header="Click to hide/show"
-       
+        <Expander Grid.Row="1"
+              HorizontalContentAlignment="Left"
+              VerticalContentAlignment="Center"
+              HorizontalAlignment="Left"
+              Background="LightSlateGray"
+              BorderBrush="Black"
+              IsExpanded="True"
+              ExpandDirection="Left"
+              Padding="3 1 1 3">
+            <StackPanel>
+                <Button Name="SaveButton" DataContext="{Binding Source={x:Static local:BGData.Instance}}" Command="{Binding Save}">
+                    Save
+                </Button>
+                <Button Name="CopyToClipButton" DataContext="{Binding Source={x:Static local:BGData.Instance}}" Command="{Binding CopyToClip}">
+                    Copy to Clipboard
+                </Button>
+            </StackPanel>
         </Expander>
-        -->
     </Grid>
+    
+    
 </Window>
