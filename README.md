@@ -32,13 +32,16 @@ UnpackedData/
 	3. "RelativeLocalizationPath" is the path to the english.xml (convert the .loca to xml before!)
 	4. "RelativeflagPaths" are the paths to tags and flags (currently treated almost the same)
 4. Run the .exe, or compile the code yourself
-5. Controls: Zoom with the mousewheel, drag with mouse
+5. Controls: Zoom with the mousewheel, drag with mouse, "copy to clipboard"/"save"-Button
 ---
 # <span style="color:red">Disclaimer</span>
 
-1. This is a early and incomplete version, things may not work or be displayed incorrect (some .lsj loop)
-2. Loading takes longer with Windows-Defender enabled
-3. The code is currently horrendous 
+1. This is a early and incomplete version, things may not work or be displayed incorrect
+   - Not everything is displayed
+   - Not everything is editable
+   - Currently you can only add nodes and connections and not remove them
+3. Loading takes longer with Windows-Defender enabled (M.2 SSD: ~10 vs ~100+ seconds)
+4. The code is kinda messy
 
 
 
@@ -48,14 +51,14 @@ UnpackedData/
 	<summary>[Spoiler warning](Astarion_InParty2.lsj))</summary>
 	Change in "Config.json": "RelativeDialoguePath" : {"path" :"Gustav\\Mods\\GustavDev\\Story\\Dialogs\\Companions\\Astarion_InParty2.lsj"},<br> 
 	Some fragments of "Astarion_InParty2.lsj":<br> 
-	<img src="https://github.com/gidHog/BGDView/assets/64482285/62cbc2d2-1704-49d1-a11b-948c7da54bf1"><br>
-	<img src="https://github.com/gidHog/BGDView/assets/64482285/b7c7a0c5-1c6e-473c-9025-feb78362d8a2"><br>
+	<img src="https://github.com/gidHog/BGDView/assets/64482285/9cc794a1-5a2b-4aa0-b46a-6caa6aa14f32"><br>
+	
 
 </details>
 
 <details>
 	<summary>[Spoiler warning](DEN_HagTrader.lsj)))</summary>
 	Change in "Config.json": "RelativeDialoguePath" : {"path" :"Gustav\\Mods\\Gustav\\Story\\Dialogs\\Act1\\DEN\\DEN_HagTrader.lsj"},<br> 
-	<img src="https://github.com/gidHog/BGDView/assets/64482285/1efa2e13-9f21-48f2-bb2c-a1e54b87f3c9">
+	<img src="https://github.com/gidHog/BGDView/assets/64482285/c229a6d9-f0f4-4c20-8141-0de74bb1ae3e">
 </details>
 

@@ -63,7 +63,7 @@ namespace BGEdit.SpeakerGroupsStructur
         public String Id { get; set; }
 
         [JsonProperty("@type")]
-        public TypeEnum Type { get; set; }
+        public String Type { get; set; }
 
         [JsonProperty("@value")]
         public string Value { get; set; }
@@ -99,154 +99,10 @@ namespace BGEdit.SpeakerGroupsStructur
 
     public enum AttributeId { Description, Name, OverwriteSpeakerUuid, Uuid };
 
-    public enum TypeEnum { LsString };
+  
 
     public enum NodeId { SpeakerGroup };
-
-    public partial class SpeakerGroupsStructurRoot
-    {
-        public static SpeakerGroupsStructurRoot FromJson(string json) => JsonConvert.DeserializeObject<SpeakerGroupsStructurRoot>(json, BGEdit.SpeakerGroupsStructur.Converter.Settings);
-    }
-
-    public static class Serialize
-    {
-        public static string ToJson(this SpeakerGroupsStructurRoot self) => JsonConvert.SerializeObject(self, BGEdit.SpeakerGroupsStructur.Converter.Settings);
-    }
-
-    internal static class Converter
-    {
-        public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
-        {
-            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-            DateParseHandling = DateParseHandling.None,
-            Converters =
-            {
-                NodeIdConverter.Singleton,
-                AttributeIdConverter.Singleton,
-                TypeEnumConverter.Singleton,
-                new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-            },
-        };
-    }
-
-    internal class NodeIdConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(NodeId) || t == typeof(NodeId?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            if (value == "SpeakerGroup")
-            {
-                return NodeId.SpeakerGroup;
-            }
-            throw new Exception("Cannot unmarshal type NodeId");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (NodeId)untypedValue;
-            if (value == NodeId.SpeakerGroup)
-            {
-                serializer.Serialize(writer, "SpeakerGroup");
-                return;
-            }
-            throw new Exception("Cannot marshal type NodeId");
-        }
-
-        public static readonly NodeIdConverter Singleton = new NodeIdConverter();
-    }
-
-    internal class AttributeIdConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(AttributeId) || t == typeof(AttributeId?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "Description":
-                    return AttributeId.Description;
-                case "Name":
-                    return AttributeId.Name;
-                case "OverwriteSpeakerUuid":
-                    return AttributeId.OverwriteSpeakerUuid;
-                case "UUID":
-                    return AttributeId.Uuid;
-            }
-            throw new Exception("Cannot unmarshal type AttributeId");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (AttributeId)untypedValue;
-            switch (value)
-            {
-                case AttributeId.Description:
-                    serializer.Serialize(writer, "Description");
-                    return;
-                case AttributeId.Name:
-                    serializer.Serialize(writer, "Name");
-                    return;
-                case AttributeId.OverwriteSpeakerUuid:
-                    serializer.Serialize(writer, "OverwriteSpeakerUuid");
-                    return;
-                case AttributeId.Uuid:
-                    serializer.Serialize(writer, "UUID");
-                    return;
-            }
-            throw new Exception("Cannot marshal type AttributeId");
-        }
-
-        public static readonly AttributeIdConverter Singleton = new AttributeIdConverter();
-    }
-
-    internal class TypeEnumConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(TypeEnum) || t == typeof(TypeEnum?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            if (value == "LSString")
-            {
-                return TypeEnum.LsString;
-            }
-            throw new Exception("Cannot unmarshal type TypeEnum");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (TypeEnum)untypedValue;
-            if (value == TypeEnum.LsString)
-            {
-                serializer.Serialize(writer, "LSString");
-                return;
-            }
-            throw new Exception("Cannot marshal type TypeEnum");
-        }
-
-        public static readonly TypeEnumConverter Singleton = new TypeEnumConverter();
-    }
+ 
 
     internal class ParseStringConverter : JsonConverter
     {

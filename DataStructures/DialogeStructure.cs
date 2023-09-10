@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using System.Globalization;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using BGEdit.GenericStructures;
 // <partial auto-generated/>
 namespace BGEdit
@@ -41,12 +39,24 @@ namespace BGEdit
 
     public partial class Dialog
     {
+        [JsonProperty("AllowDeadSpeakers")]
+        public TypeValPairBool AllowDeadSpeakers { get; set; }
         [JsonProperty("DefaultAddressedSpeakers")]
-        public DefaultAddressedSpeaker[] DefaultAddressedSpeakers { get; set; }
-
+        public List<DefaultAddressedSpeaker> DefaultAddressedSpeakers { get; set; }
+      
+        [JsonProperty("DefaultSpeakerIndex")]
+        public TypeValPairInt32 DefaultSpeakerIndex { get; set; }
         [JsonProperty("IsAllowingJoinCombat")]
-        public IsAllowingJoinCombat IsAllowingJoinCombat { get; set; }
+        public TypeValPairBool IsAllowingJoinCombat { get; set; }
 
+        [JsonProperty("IsBehaviour")]
+        public TypeValPairBool IsBehaviour { get; set; }
+        [JsonProperty("IsPrivateDialog")]
+        public TypeValPairBool IsPrivateDialog { get; set; }
+        [JsonProperty("IsSubbedDialog")]
+        public TypeValPairBool IsSubbedDialog { get; set; }
+        [JsonProperty("IsWorld")]
+        public TypeValPairBool IsWorld { get; set; }
         [JsonProperty("TimelineId")]
         public TypeValPairStr TimelineId { get; set; }
 
@@ -59,11 +69,14 @@ namespace BGEdit
         [JsonProperty("category")]
         public TypeValPairStr Category { get; set; }
 
+        [JsonProperty("issfxdialog")]
+        public TypeValPairBool issfxdialog { get; set; }
+
         [JsonProperty("nodes")]
-        public DialogNode[] Nodes { get; set; }
+        public List<DialogNode> Nodes { get; set; }
 
         [JsonProperty("speakerlist")]
-        public Speakerlist[] Speakerlist { get; set; }
+        public List<Speakerlist> Speakerlist { get; set; }
     }
 
     public partial class IsAllowingJoinCombat
@@ -75,27 +88,28 @@ namespace BGEdit
         public bool Value { get; set; }
     }
 
-    public partial class TimelineId
+   
+
+    public partial class DefaultAddressedSpeakerObject
     {
-        [JsonProperty("type")]
-        public TypeEnum Type { get; set; }
-
-        [JsonProperty("value")]
-        public string Value { get; set; }
+        [JsonProperty("MapKey")]
+        public TypeValPairInt32 MapKey { get; set; }
+        [JsonProperty("MapValue")]
+        public TypeValPairInt32 MapValue { get; set; }
     }
-
-    //todo remove
     public partial class DefaultAddressedSpeaker
     {
+        [JsonProperty("Object")]
+        public List<DefaultAddressedSpeakerObject> Object { get; set; }
     }
 
     public partial class DialogNode
     {
         [JsonProperty("RootNodes")]
-        public RootNode[] RootNodes { get; set; }
+        public List<RootNode> RootNodes { get; set; }
 
         [JsonProperty("node")]
-        public NodeNode[] Node { get; set; }
+        public List<NodeNode> Node { get; set; }
     }
 
     public class UUID
@@ -105,18 +119,38 @@ namespace BGEdit
 
         [JsonProperty("value")]
         public string value { get; set; }
+
+        public UUID() { }
+        public UUID(string type, string value)
+        {
+            this.type = type;
+            this.value = value;
+        }
     }
     public partial class Child
     {
 
         [JsonProperty("UUID")]
         public UUID UUID { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Child);
+        }
+
+        public bool Equals(Child obj)
+        {
+            return obj != null && obj.UUID.value != null && this.UUID !=null && obj.UUID.value == this.UUID.value;
+   
+        }
+
     }
 
     public partial class Children
     {
         [JsonProperty("child")]
-        public Child[] children { get; set; }
+        public List<Child> children { get; set; }
+
     }
 
 
@@ -133,7 +167,7 @@ namespace BGEdit
     public partial class Checkflag
     {
         [JsonProperty("flaggroup")]
-        public Flaggroup[] flaggroup { get; set; }
+        public List<Flaggroup> flaggroup { get; set; }
     }
     public partial class Flaggroup
     {
@@ -141,7 +175,7 @@ namespace BGEdit
         public List<Flag> flag { get; set; }
 
         [JsonProperty("type")]
-        public FlaggroupType type { get; set; }
+        public TypeValPairStr type { get; set; }
     }
     public partial class Flag
     {
@@ -153,14 +187,7 @@ namespace BGEdit
         public TypeValPairBool value { get; set; }
     }
 
-    public partial class FlaggroupType
-    {
-        [JsonProperty("type")]
-        public string type { get; set; }
 
-        [JsonProperty("value")]
-        public string value { get; set; }
-    }
     public partial class Value
     {
         [JsonProperty("type")]
@@ -177,17 +204,24 @@ namespace BGEdit
 
         [JsonProperty("val")]
         public TypeValPairStr Val { get; set; }
+        public EditorDataNodeData(){}
+        public EditorDataNodeData(TypeValPairStr Key, TypeValPairStr Val)
+        {
+            this.Val = Val;
+            this.Key = Key;
+        }
+
     }
     public partial class EditorDataNode
     {
         [JsonProperty("data")]
-        public EditorDataNodeData[] Data { get; set; }
+        public List<EditorDataNodeData> Data { get; set; }
     }
 
     public partial class SpeakerLinkingEntries
     {
         [JsonProperty("SpeakerLinkingEntry")]
-        public SpeakerLinkingEntry[] SpeakerLinkingEntry { get; set; }
+        public List<SpeakerLinkingEntry> SpeakerLinkingEntry { get; set; }
     }
 
     public partial class SpeakerLinkingEntry
@@ -198,56 +232,118 @@ namespace BGEdit
         public TypeValPairInt32 value { get; set; }
     }
 
+    public partial class ValidatedFlags
+    {
+        [JsonProperty("ValidatedHasValue")]
+        public TypeValPairStr ValidatedHasValue { get; set; }
+        [JsonProperty("flaggroup")]
+        public List<Flaggroup> Flaggroup { get; set; }
+    }
+
     public partial class NodeNode
     {
-        
+        [JsonIgnore]
+        public List<String> Parents { get; set; } = new List<String> ();
         public TypeValPairStr NestedDialogNodeUUID { get; set; }
+        [JsonProperty("Ability")]
+        public TypeValPairStr Ability { get; set; }
 
+        [JsonProperty("AllowGrouping")]
+        public TypeValPairBool AllowGrouping { get; set; }
+        [JsonProperty("AllowNodeGrouping")]
+        public TypeValPairBool AllowNodeGrouping { get; set; }
+        [JsonProperty("Advantage")]
+        public TypeValPairUInt8 Advantage { get; set; }
+        [JsonProperty("addressedspeaker")]
+        public TypeValPairInt32 addressedspeaker { get; set; }
+        [JsonProperty("DifficultyClassID")]
+        public TypeValPairStr DifficultyClassID { get; set; }
+
+        [JsonProperty("ExcludeCompanionsOptionalBonuses")]
+        public TypeValPairBool ExcludeCompanionsOptionalBonuses { get; set; }
+        [JsonProperty("ExcludeSpeakerOptionalBonuses")]
+        public TypeValPairBool ExcludeSpeakerOptionalBonuses { get; set; }
+        [JsonProperty("exclusive")]
+        public TypeValPairBool exclusive { get; set; }
+        [JsonProperty("gameplaynode")]
+        public TypeValPairBool gameplaynode { get; set; }
+        [JsonProperty("stub")]
+        public TypeValPairBool stub { get; set; }
+        [JsonProperty("suppresssubtitle")]
+        public TypeValPairBool suppresssubtitle { get; set; }
+ 
+        [JsonProperty("waittime")]
+        public TypeValPairFloat waittime { get; set; }
+        [JsonProperty("RollTargetSpeaker")]
+        public TypeValPairInt32 RollTargetSpeaker { get; set; }
+        [JsonProperty("RollType")]
+        public TypeValPairStr RollType { get; set; }
+        [JsonProperty("Success")]
+        public TypeValPairStr Success { get; set; }
+        [JsonProperty("ApprovalRatingID")]
+        public TypeValPairStr ApprovalRatingID { get; set; }
         [JsonProperty("SpeakerLinking")]
-        SpeakerLinkingEntries[] SpeakerLinking { get; set; }
+        public List<SpeakerLinkingEntries> SpeakerLinking { get; set; }
         [JsonProperty("GameData")]
-        public GameDatum[] GameData { get; set; }
+        public List<GameData> GameData { get; set; }
+        [JsonProperty("Greeting")]
+        public TypeValPairBool Greeting { get; set; }
+        [JsonProperty("ValidatedFlags")]
+        public List<ValidatedFlags> ValidatedFlags { get; set; }
+        [JsonProperty("Result")]
+        public TypeValPairBool Result { get; set; }
         [JsonProperty("GroupID")]
         public TypeValPairStr GroupID { get; set; }
         [JsonProperty("GroupIndex")]
         public TypeValPairInt32 GroupIndex { get; set; }
-
+        [JsonProperty("ShowOnce")]
+        public TypeValPairBool showOnce { get; set; }
+        [JsonProperty("Skill")]
+        public TypeValPairStr Skill { get; set; }
+  
+        [JsonProperty("SourceNode")]
+        public TypeValPairStr SourceNode { get; set; }
         [JsonProperty("TaggedTexts")]
-        public NodeTaggedText[] TaggedTexts { get; set; }
+        public List<NodeTaggedText> TaggedTexts { get; set; }
         [JsonProperty("Tags")]
-        public DefaultAddressedSpeaker[] Tags { get; set; }
+        public List<TagTag> Tags { get; set; }
         [JsonProperty("UUID")]
         public TypeValPairStr Uuid { get; set; }
-
-
+       
         [JsonProperty("checkflags")]
-        public Checkflag[] Checkflags { get; set; }
+        public List<Checkflag> Checkflags { get; set; }
+        [JsonProperty("PopLevel")]
+        public TypeValPairInt32 PopLevel { get; set; }
 
         [JsonProperty("children")]
-        public Children[] children { get; set; }
+        //public Children[] children { get; set; }
+        public List<Children> children { get; set; }
 
         [JsonProperty("constructor")]
         public TypeValPairStr Constructor { get; set; }
 
-
         [JsonProperty("editorData")]
-        public EditorDataNode[] EditorData { get; set; }
+        public List<EditorDataNode> EditorData { get; set; }
 
-     
+        [JsonProperty("optional")]
+        public TypeValPairBool optional { get; set; }
 
         [JsonProperty("speaker")]
         public NextNodeId Speaker { get; set; }
+        [JsonProperty("transitionmode")]
+        public TypeValPairUInt8 Transitionmode { get; set; }
         [JsonProperty("jumptarget")]
         public Jumptarget Jumptarget { get; set; }
-
+        [JsonProperty("jumptargetpoint")]
+        public TypeValPairUInt8 jumptargetpoint { get; set; }
         [JsonProperty("Root")]
-        public IsAllowingJoinCombat Root { get; set; }
+        public TypeValPairBool Root { get; set; }
 
         [JsonProperty("endnode")]
-        public IsAllowingJoinCombat Endnode { get; set; }
+        public TypeValPairBool Endnode { get; set; }
 
         [JsonProperty("setflags")]
-        public Flags[] Setflags { get; set; }
+        public List<Flags> Setflags { get; set; }
 
 
     }
@@ -255,28 +351,66 @@ namespace BGEdit
     public partial class DefaultAttitude
     {
         [JsonProperty("data")]
-        public Datum[] Data { get; set; }
+        public List<Datum> Data { get; set; }
     }
 
     public partial class Datum
     {
         [JsonProperty("key")]
-        public TimelineId Key { get; set; }
+        public TypeValPairStr Key { get; set; }
 
         [JsonProperty("val")]
-        public TimelineId Val { get; set; }
+        public TypeValPairStr Val { get; set; }
     }
 
-    public partial class GameDatum
+    public partial class LookAts
+    {
+        [JsonProperty("Speaker")]
+        public TypeValPairUInt16 Speaker { get; set; }
+        [JsonProperty("Target")]
+        public TypeValPairUInt16 Target { get; set; }
+    }
+
+    public partial class AiPersonal
+    {
+        [JsonProperty("AiPersonality")]
+        TypeValPairStr AiPersonality { get; set; }
+}
+    public partial class AiPersonalities
+    {
+        [JsonProperty("AiPersonality")]
+        List<AiPersonal> AiPersonality { get; set; }
+    }
+    public partial class MusicInstrumentSounds
+    {
+
+    }
+
+    public partial class OriginSound
+    {
+
+    }
+    public partial class GameData
     {
         [JsonProperty("AiPersonalities")]
-        public DefaultAddressedSpeaker[] AiPersonalities { get; set; }
+        public List<AiPersonalities> AiPersonalities { get; set; }
 
+        [JsonProperty("LookAts")]
+        public List<LookAts> LookAts { get; set; }
+        [JsonProperty("CameraTarget")]
+        public TypeValPairInt32 CameraTarget { get; set; }
+        [JsonProperty("CustomMovie")]
+        public TypeValPairStr CustomMovie { get; set; }
+        [JsonProperty("ExtraWaitTime")]
+        public TypeValPairInt32 ExtraWaitTime { get; set; }
         [JsonProperty("MusicInstrumentSounds")]
-        public DefaultAddressedSpeaker[] MusicInstrumentSounds { get; set; }
+        public List<MusicInstrumentSounds> MusicInstrumentSounds { get; set; }
 
         [JsonProperty("OriginSound")]
-        public DefaultAddressedSpeaker[] OriginSound { get; set; }
+        public List<OriginSound> OriginSound { get; set; }
+        [JsonProperty("SoundEvent")]
+        public TypeValPairStr SoundEvent { get; set; }
+        
     }
 
     public partial class NextNodeId
@@ -291,21 +425,21 @@ namespace BGEdit
     public partial class NodeTaggedText
     {
         [JsonProperty("TaggedText")]
-        public TaggedTextTaggedText[] TaggedText { get; set; }
+        public List<TaggedTextTaggedText> TaggedText { get; set; }
     }
     public partial class RuleGroup
     {
         [JsonProperty("Rules")]
-        public RuleGroupRule[] Rules { get; set; }
+        public List<RuleGroupRule> Rules { get; set; }
 
         [JsonProperty("TagCombineOp")]
-        public TagCombineOp TagCombineOp { get; set; }
+        public TypeValPairUInt8 TagCombineOp { get; set; }
     }
 
     public partial class RuleGroupRule
     {
         [JsonProperty("Rule")]
-        public RuleRule[] Rule { get; set; }
+        public List<RuleRule> Rule { get; set; }
     }
 
     public partial class RuleRule
@@ -317,7 +451,7 @@ namespace BGEdit
         public TagCombineOp TagCombineOp { get; set; }
 
         [JsonProperty("Tags")]
-        public RuleTag[] Tags { get; set; }
+        public List<RuleTag> Tags { get; set; }
 
         [JsonProperty("speaker")]
         public TagCombineOp Speaker { get; set; }
@@ -344,13 +478,21 @@ namespace BGEdit
     public partial class RuleTag
     {
         [JsonProperty("Tag")]
-        public TagTag[] Tag { get; set; }
+        public List<TagTag> Tag { get; set; }
     }
 
+    public partial class NestedTag
+    {
+        [JsonProperty("Tag")]
+        public TypeValPairStr nestedTag { get; set; }
+    }
     public partial class TagTag
     {
         [JsonProperty("Object")]
         public Object Object { get; set; }
+        [JsonProperty("Tag")]
+        public List<NestedTag> tag { get; set; }
+
     }
 
     public partial class Object
@@ -367,22 +509,32 @@ namespace BGEdit
         public IsAllowingJoinCombat HasTagRule { get; set; }
 
         [JsonProperty("RuleGroup")]
-        public RuleGroup[] RuleGroup { get; set; }
+        public List<RuleGroup> RuleGroup { get; set; }
 
         [JsonProperty("TagTexts")]
-        public TaggedTextTagText[] TagTexts { get; set; }
+        public List<TaggedTextTagText> TagTexts { get; set; }
     }
 
     public partial class TaggedTextTagText
     {
         [JsonProperty("TagText")]
-        public TagTextTagText[] TagTextArray { get; set; }
+        public List<TagTextTagText> TagTextArray { get; set; }
     }
 
+    public partial class DialogVariables
+    {
+        [JsonProperty("DialogVariables")]
+        public TypeValPairStr DialogVariable { get; set; }
+    }
     public partial class TagTextTagText
     {
+        [JsonProperty("DialogVariables")]
+        public List<DialogVariables> DialogVariables { get; set; }
         [JsonProperty("LineId")]
-        public TimelineId LineId { get; set; }
+        public TypeValPairStr LineId { get; set; }
+
+        [JsonProperty("CustomSequenceId")]
+        public TypeValPairStr CustomSequenceId { get; set; }
 
         [JsonProperty("OldText")]
         public Text OldText { get; set; }
@@ -391,7 +543,7 @@ namespace BGEdit
         public Text TagText { get; set; }
 
         [JsonProperty("stub")]
-        public IsAllowingJoinCombat Stub { get; set; }
+        public TypeValPairBool Stub { get; set; }
     }
 
     public partial class Text
@@ -415,16 +567,21 @@ namespace BGEdit
     public partial class Speakerlist
     {
         [JsonProperty("speaker")]
-        public Speaker[] Speaker { get; set; }
+        public List<Speaker> Speaker { get; set; }
     }
 
     public partial class Speaker
     {
+        [JsonProperty("IsPeanutSpeaker")]
+        public TypeValPairBool IsPeanutSpeaker { get; set; }
+
         [JsonProperty("SpeakerMappingId")]
         public TypeValPairStr SpeakerMappingId { get; set; }
-
+        [JsonProperty("SpeakerTagsIndex")]
+        public TypeValPairStr SpeakerTagsIndex { get; set; }
         [JsonProperty("index")]
         public TypeValPairStr Index { get; set; }
+  
 
         [JsonProperty("list")]
         public TypeValPairStr List { get; set; }
@@ -441,47 +598,60 @@ namespace BGEdit
     public partial class FlagCombinationFlags
     {
         [JsonProperty("flaggroup")]
-        public Flaggroup[] flaggroup { get; set; }
+        public List<Flaggroup> flaggroup { get; set; }
     }
 
     public partial class Flags
     {
         [JsonProperty("flaggroup")]
-        public Flaggroup[] flaggroup { get; set; }
+        public List<Flaggroup> flaggroup { get; set; }
     }
     public partial class FlagCombination
     {
         [JsonProperty("data")]
-        public FlagCombinationData[] data { get; set; }
+        public List<FlagCombinationData> data { get; set; }
 
         [JsonProperty("flags")]
-        public Flags[] flags { get; set; }
+        public List<Flags> flags { get; set; }
     }
     public partial class FlagCombinations
     {
         [JsonProperty("flagCombination")]
-        public FlagCombination[] flagCombinations { get; set; }
+        public List<FlagCombination> flagCombinations { get; set; }
     }
- 
+    
+    public partial class IsPeanuts
+    {
+        [JsonProperty("data")]
+        public List<EditorDataNodeData> HowToTrigger { get; set; }
+
+    }
+
+
+    public partial class isImportantForStagings
+    {
+        [JsonProperty("data")]
+        public List<EditorDataNodeData> IsImportantForStagings { get; set; }
+    }
     public partial class EditorData
     {
         [JsonProperty("HowToTrigger")]
         public TypeValPairStr HowToTrigger { get; set; }
 
         [JsonProperty("defaultAttitudes")]
-        public DefaultAttitude[] DefaultAttitudes { get; set; }
+        public List<DefaultAttitude> DefaultAttitudes { get; set; }
 
         [JsonProperty("defaultEmotions")]
-        public DefaultAttitude[] DefaultEmotions { get; set; }
+        public List<DefaultAttitude> DefaultEmotions { get; set; }
 
         [JsonProperty("ignoreInvalidFlagCombinations")]
-        public FlagCombinations[] FlagCombination { get; set; }
+        public List<FlagCombinations> FlagCombination { get; set; }
 
         [JsonProperty("isImportantForStagings")]
-        public DefaultAttitude[] IsImportantForStagings { get; set; }
-
+        public List<isImportantForStagings> IsImportantForStagings { get; set; }
+    
         [JsonProperty("isPeanuts")]
-        public DefaultAttitude[] IsPeanuts { get; set; }
+        public List<IsPeanuts> IsPeanuts { get; set; }
 
         [JsonProperty("needLayout")]
         public TypeValPairBool NeedLayout { get; set; }
@@ -490,84 +660,36 @@ namespace BGEdit
         public TypeValPairUInt32 NextNodeId { get; set; }
 
         [JsonProperty("speakerSlotDescription")]
-        public DefaultAttitude[] SpeakerSlotDescription { get; set; }
+        public List<DefaultAttitude> SpeakerSlotDescription { get; set; }
 
         [JsonProperty("synopsis")]
         public TypeValPairStr Synopsis { get; set; }
+
+        [JsonProperty("templateInstances")]
+
+        public List<TemplateInstances> templateInstances { get; set; }
     }
-
-    public enum TypeEnum { FixedString, Guid, LsString };
-
-    public partial class DialogueStructurRoot
+    public partial class SpeakerLinkingTemplate
     {
-        public static DialogueStructurRoot FromJson(string json) => JsonConvert.DeserializeObject<DialogueStructurRoot>(json, BGEdit.Converter.Settings);
+        [JsonProperty("data")]
+        public List<EditorDataNodeData> data { get; set; }
     }
-
-    public static class Serialize
+    public partial class TemplateInstance
     {
-        public static string ToJson(this DialogueStructurRoot self) => JsonConvert.SerializeObject(self, BGEdit.Converter.Settings);
+        [JsonProperty("data")]
+        public List<EditorDataNodeData> data { get; set; }
+        //todo prob. wring
+        [JsonProperty("flagParameterMappings")]
+        public List<EditorDataNodeData> flagParameterMappings { get; set; }
+        [JsonProperty("SpeakerLinking")]
+        public List<SpeakerLinkingTemplate> SpeakerLinking { get; set; }
+        [JsonProperty("speakerlist")]
+        public List<Speakerlist> Speakerlist { get; set; }
     }
-
-    internal static class Converter
+    public partial class TemplateInstances
     {
-        public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
-        {
-            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-            DateParseHandling = DateParseHandling.None,
-            Converters =
-            {
-                TypeEnumConverter.Singleton,
-                new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-            },
-        };
-    }
-
-    internal class TypeEnumConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(TypeEnum) || t == typeof(TypeEnum?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "FixedString":
-                    return TypeEnum.FixedString;
-                case "LSString":
-                    return TypeEnum.LsString;
-                case "guid":
-                    return TypeEnum.Guid;
-                default:
-                    return TypeEnum.LsString;
-            }
-            throw new Exception("Cannot unmarshal type TypeEnum");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (TypeEnum)untypedValue;
-            switch (value)
-            {
-                case TypeEnum.FixedString:
-                    serializer.Serialize(writer, "FixedString");
-                    return;
-                case TypeEnum.LsString:
-                    serializer.Serialize(writer, "LSString");
-                    return;
-                case TypeEnum.Guid:
-                    serializer.Serialize(writer, "guid");
-                    return;
-            }
-            throw new Exception("Cannot marshal type TypeEnum");
-        }
-
-        public static readonly TypeEnumConverter Singleton = new TypeEnumConverter();
+        [JsonProperty("templateInstance")]
+        public List<TemplateInstance> templateInstance { get; set; }
     }
 
 }
