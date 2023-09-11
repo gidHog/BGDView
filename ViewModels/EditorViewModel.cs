@@ -490,7 +490,10 @@ namespace BGEdit
                         bgData.RemoveFlag(node, flagUUID.Text);
                         });
                     foundNode.CheckFlagEditable.Add(panel);
-                    if (!startUp) bgData.AddOrUpdateFlag(node, flagUUID.Text, flagType.Text, flagValue.IsChecked.Value, parVal, false);
+                    if (!startUp)
+                    {
+                        bgData.AddOrUpdateFlag(node, flagUUID.Text, flagType.Text, flagValue.IsChecked.Value, parVal, false);
+                    }
                 }
             }
         }
@@ -699,11 +702,9 @@ namespace BGEdit
             }
           
             PopulateNodeWithData(source, node, bgData, groupInfostoAdd, tagTextToAdd);
-           
-           
             AddNodeRecursion(node, bgData);
             GenericNodeActions.AddInfoToNodeView(node, AddedNodes[nUUID]);
-
+            
         }
 
         private void AddNodeRecursion(NodeNode node, BGData bgData)

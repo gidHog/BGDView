@@ -1,23 +1,17 @@
-﻿using BGEdit;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using Newtonsoft.Json;
 using BGEdit.LocalizationStructur;
 using System.Windows;
-using Newtonsoft.Json.Linq;
 using BGEdit.GenericStructures;
-using System.Diagnostics.Eventing.Reader;
 using System.Windows.Input;
 using System.Text;
-using System.Reflection;
-using System.ComponentModel;
-using System.Security.Principal;
 using Microsoft.Win32;
 using System.Text.RegularExpressions;
 using BGEdit.SpeakerGroupsStructur;
-using System.Windows.Media.Animation;
+using System.Linq;
 
 namespace BGEdit
 {
@@ -236,135 +230,83 @@ namespace BGEdit
             }
         }
 
-        public void UpdateHasTagRule(NodeNode node, bool value, int index =0 )
+        private bool IsValidNode(NodeNode node)
         {
-            if (!(node == null
-               || node.TaggedTexts == null
-               || node.TaggedTexts.Count <= 0
-               || index < 0
-               || index >= node.TaggedTexts[0].TaggedText.Count
-               || node.TaggedTexts[0].TaggedText[index] == null
-               || node.TaggedTexts[0].TaggedText[index].HasTagRule == null))
+            return node != null && node.TaggedTexts != null && node.TaggedTexts.Count > 0;
+        }
+
+        private bool IsValidTaggedText(NodeNode node, int index)
+        {
+            return IsValidNode(node) && index >= 0 && index < node.TaggedTexts[0].TaggedText.Count && node.TaggedTexts[0].TaggedText[index] != null;
+        }
+
+        private bool IsValidRuleGroup(NodeNode node, int index, int rgIndex)
+        {
+            return IsValidTaggedText(node, index) && node.TaggedTexts[0].TaggedText[index].RuleGroup != null && rgIndex >= 0 && rgIndex < node.TaggedTexts[0].TaggedText[index].RuleGroup.Count;
+        }
+
+        private bool IsValidTagText(NodeNode node, int index, int tgIndex)
+        {
+            return IsValidTaggedText(node, index) && node.TaggedTexts[0].TaggedText[index].TagTexts != null && tgIndex >= 0 && tgIndex < node.TaggedTexts[0].TaggedText[index].TagTexts.Count;
+        }
+
+        private bool IsValidTagTextArray(NodeNode node, int index, int tgIndex, int tgArrayIndex)
+        {
+            return IsValidTagText(node, index, tgIndex) && node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray != null && tgArrayIndex >= 0 && tgArrayIndex < node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray.Count;
+        }
+
+        public void UpdateHasTagRule(NodeNode node, bool value, int index = 0)
+        {
+            if (IsValidTaggedText(node, index) && node.TaggedTexts[0].TaggedText[index].HasTagRule != null)
             {
                 node.TaggedTexts[0].TaggedText[index].HasTagRule.Value = value;
                 AddOrUpdateNode(node);
             }
-               
         }
 
-        public void UpdateTagCombineType(NodeNode node, String value, int index = 0, int rgIndex = 0)
+        public void UpdateTagCombineType(NodeNode node, string value, int index = 0, int rgIndex = 0)
         {
-            if (!(node == null
-            || node.TaggedTexts == null
-            || node.TaggedTexts.Count <= 0
-            || index < 0
-            || index >= node.TaggedTexts[0].TaggedText.Count
-            || node.TaggedTexts[0].TaggedText[index] == null
-            || node.TaggedTexts[0].TaggedText[index].RuleGroup == null
-            || rgIndex < 0
-            || rgIndex >= node.TaggedTexts[0].TaggedText[index].RuleGroup.Count
-            || node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex] == null
-            || node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex].TagCombineOp == null))
+            if (IsValidRuleGroup(node, index, rgIndex) && node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex].TagCombineOp != null)
             {
-
                 node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex].TagCombineOp.Type = value;
                 AddOrUpdateNode(node);
             }
-
         }
 
         public void UpdateTagCombineValue(NodeNode node, byte value, int index = 0, int rgIndex = 0)
         {
-            if (!(node == null
-                || node.TaggedTexts == null
-                || node.TaggedTexts.Count <= 0
-                || index < 0
-                || index >= node.TaggedTexts[0].TaggedText.Count
-                || node.TaggedTexts[0].TaggedText[index] == null
-                || node.TaggedTexts[0].TaggedText[index].RuleGroup == null
-                || rgIndex < 0
-                || rgIndex >= node.TaggedTexts[0].TaggedText[index].RuleGroup.Count
-                || node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex] == null
-                || node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex].TagCombineOp == null))
+            if (IsValidRuleGroup(node, index, rgIndex) && node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex].TagCombineOp != null)
             {
                 node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex].TagCombineOp.Value = value;
                 AddOrUpdateNode(node);
             }
-
-         
         }
 
-        public void UpdateLineUUIDNumber(NodeNode node, String value,int index = 0, int tgIndex = 0, int tgArrayIndex = 0)
+        public void UpdateLineUUIDNumber(NodeNode node, string value, int index = 0, int tgIndex = 0, int tgArrayIndex = 0)
         {
-            if (!(node == null
-                || node.TaggedTexts == null
-                || node.TaggedTexts.Count <= 0
-                || index < 0
-                || index >= node.TaggedTexts[0].TaggedText.Count
-                || node.TaggedTexts[0].TaggedText[index] == null
-                || node.TaggedTexts[0].TaggedText[index].TagTexts == null
-                || tgIndex < 0
-                || tgIndex >= node.TaggedTexts[0].TaggedText[index].TagTexts.Count
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex] == null
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray == null
-                || tgArrayIndex < 0
-                || tgArrayIndex >= node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray.Count
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex] == null
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].LineId == null))
+            if (IsValidTagTextArray(node, index, tgIndex, tgArrayIndex) && node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].LineId != null)
             {
                 node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].LineId.Value = value;
                 AddOrUpdateNode(node);
             }
-
-           
         }
 
-        public void UpdateLocalisationUUID(NodeNode node, String value, int index = 0, int tgIndex = 0, int tgArrayIndex = 0)
+        public void UpdateLocalisationUUID(NodeNode node, string value, int index = 0, int tgIndex = 0, int tgArrayIndex = 0)
         {
-            if (!(node == null
-            || node.TaggedTexts == null
-            || node.TaggedTexts.Count <= 0
-            || index < 0
-            || index >= node.TaggedTexts[0].TaggedText.Count
-            || node.TaggedTexts[0].TaggedText[index] == null
-            || node.TaggedTexts[0].TaggedText[index].TagTexts == null
-            || tgIndex < 0
-            || tgIndex >= node.TaggedTexts[0].TaggedText[index].TagTexts.Count
-            || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex] == null
-            || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray == null
-            || tgArrayIndex < 0
-            || tgArrayIndex >= node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray.Count
-            || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex] == null
-            || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].LineId == null))
+            if (IsValidTagTextArray(node, index, tgIndex, tgArrayIndex) && node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].TagText.Handle != null)
             {
                 node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].TagText.Handle = value;
                 AddOrUpdateNode(node);
             }
-
-               
         }
+
         public void UpdateIsStub(NodeNode node, bool value, int index = 0, int tgIndex = 0, int tgArrayIndex = 0)
         {
-            if (!(node == null
-                || node.TaggedTexts == null
-                || node.TaggedTexts.Count <= 0
-                || index < 0
-                || index >= node.TaggedTexts[0].TaggedText.Count
-                || node.TaggedTexts[0].TaggedText[index] == null
-                || node.TaggedTexts[0].TaggedText[index].TagTexts == null
-                || tgIndex < 0
-                || tgIndex >= node.TaggedTexts[0].TaggedText[index].TagTexts.Count
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex] == null
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray == null
-                || tgArrayIndex < 0
-                || tgArrayIndex >= node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray.Count
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex] == null
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].Stub == null))
+            if (IsValidTagTextArray(node, index, tgIndex, tgArrayIndex) && node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].Stub != null)
             {
                 node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].Stub.Value = value;
                 AddOrUpdateNode(node);
             }
-            
         }
 
         public void UpdatePopLevel(NodeNode node, Int32 value)
@@ -593,7 +535,6 @@ namespace BGEdit
                     if (item2.UUID.Value == flagUUID)
                     {
                         Console.WriteLine("Found flag!");
-                        foundFlag = true;
                         item2.paramval.Value = paramval;
                         item2.value.Value = value;
                         foundFlag = true;
@@ -657,71 +598,59 @@ namespace BGEdit
        
         private const string splitTagOn = "#SplitSeperator#";
         private bool merge = false;
-        public void LoadTags(String[] tagsPaths)
+        public void LoadTags(string[] tagsPaths)
         {
             Console.WriteLine("Loading Flags");
-            foreach (String tagPath in tagsPaths) {
-                string[] files = Directory.GetFiles(tagPath);
+            foreach (string tagPath in tagsPaths)
+            {
+                string[] files = Directory.GetFiles(tagPath).Where(file => !file.Contains("lsf")).ToArray();
+
                 foreach (string file in files)
                 {
-                    if (!file.Contains("lsf")) {  
-                        XmlDocument doc = new XmlDocument();
-                        doc.Load(file);
-                        string jsonText = JsonConvert.SerializeXmlNode(doc);
-                        if (merge)
-                        {
-                            string fileName = "merged.json";
-                            try
-                            {
-                                using (StreamWriter writer = File.AppendText(fileName))
-                                {
-                                    writer.Write(jsonText + splitTagOn);
-                                }
-                            }
-                            catch (Exception exp)
-                            {
-                                Console.Write(exp.Message);
-                            }
-                        }
-               
-
-                        BGEdit.TagStructur.TagStructurRoot TagStructurRoot = BGEdit.TagStructur.TagStructurRoot.FromJson(jsonText);
-                        foreach (var item in TagStructurRoot.Save.Region.Node.Attribute)
-                        {
-                            if (TagStructurRoot.attributes.ContainsKey(item.Id))
-                            {
-                                TagStructurRoot.attributes[item.Id] = item;
-                            }
-                            else
-                            {
-                                TagStructurRoot.attributes.Add(item.Id, item);
-                            }
-                       
-                        }
-                        if (!tagData.ContainsKey(file.Substring(0, file.IndexOf('.')).Replace(tagPath + "\\", "")))
-                        {
-                            tagData.Add(file.Substring(0, file.IndexOf('.')).Replace(tagPath + "\\", ""), TagStructurRoot);
-                        }
-                        else
-                        {
-                            tagData[file.Substring(0, file.IndexOf('.')).Replace(tagPath + "\\", "")] =  TagStructurRoot;
-                        }
-                 
-                   
-                        if (!tagData.ContainsKey(TagStructurRoot.attributes["UUID"].Value))
-                        {              
-                            tagData.Add(TagStructurRoot.attributes["UUID"].Value, TagStructurRoot);
-                        }
-                        else
-                        {
-                             tagData[TagStructurRoot.attributes["UUID"].Value]= TagStructurRoot;
-                        }
-                 
+                    string jsonText = ConvertXmlToJson(file);
+                    if (merge)
+                    {
+                        AppendTextToFile("merged.json", jsonText + splitTagOn);
                     }
-      
+
+                    BGEdit.TagStructur.TagStructurRoot tagStructurRoot = BGEdit.TagStructur.TagStructurRoot.FromJson(jsonText);
+                    UpdateAttributes(tagStructurRoot);
+
+                    string trimmedFilePath = file.Substring(0, file.LastIndexOf('.')).Replace(tagPath + "\\", "");
+                    tagData[trimmedFilePath] = tagStructurRoot;
+                    tagData[tagStructurRoot.attributes["UUID"].Value] = tagStructurRoot;
                 }
             }
+        }
 
+        private string ConvertXmlToJson(string filePath)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.Load(filePath);
+            return JsonConvert.SerializeXmlNode(doc);
+        }
+
+        private void AppendTextToFile(string fileName, string text)
+        {
+            try
+            {
+                using (StreamWriter writer = File.AppendText(fileName))
+                {
+                    writer.Write(text);
+                }
+            }
+            catch (Exception exp)
+            {
+                Console.Write(exp.Message);
+            }
+        }
+
+        private void UpdateAttributes(BGEdit.TagStructur.TagStructurRoot tagStructurRoot)
+        {
+            foreach (var item in tagStructurRoot.Save.Region.Node.Attribute)
+            {
+                tagStructurRoot.attributes[item.Id] = item;
+            }
         }
         public void LoadLocalization(String path)
         {
