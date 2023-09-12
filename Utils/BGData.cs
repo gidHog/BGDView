@@ -98,7 +98,7 @@ namespace BGEdit
             node.children = new List<Children>();
             node.Constructor = new TypeValPairStr();
             node.EditorData = new List<EditorDataNode>();
-            node.Speaker = new NextNodeId();
+            node.Speaker = new TypeValPairInt32();
             node.Jumptarget = new Jumptarget();
             node.Root = new TypeValPairBool("bool", false);
             node.Endnode = new TypeValPairBool("bool", false);
@@ -176,25 +176,14 @@ namespace BGEdit
         }
         public bool AddOrUpdateNode(NodeNode node)
         {
-            try
+            if (node == null || node.Uuid == null)
             {
-                if (node != null )
-                {
-                    var uuid = node.Uuid.Value;
-                    if (!dialogeNodes.ContainsKey(uuid))
-                    {
-                        dialogeNodes.Add(uuid, node);
-                        return true;
-                    }
-                    dialogeNodes[uuid] = node;
-                    return true;
-                }
-               
-            }catch (Exception ex) { 
-                Console.WriteLine(ex.Message);
                 return false;
             }
-            return false;
+            var uuid = node.Uuid.Value;
+            dialogeNodes[uuid]= node;
+            
+            return true;
         }
 
         public void RemoveConnection(String UUIDFrom, String UUIDTo)
@@ -203,6 +192,7 @@ namespace BGEdit
             {
                 foreach (var children in dialogeNodes[UUIDFrom].children)
                 {
+                    if(children == null || children.children == null)
                     foreach(var child in children.children)
                     {
                         //found Connection
@@ -219,17 +209,41 @@ namespace BGEdit
 
         public void RemoveNode(NodeNode node)
         {
-            String uuid = node.Uuid.Value;
-            foreach (String ParentUUID in node.Parents)
+
+            Console.WriteLine("Rome Called " + node.Uuid.Value);
+            Console.WriteLine(dialogeNodes.Remove(node.Uuid.Value));
+            List<String> parents = node.Parents;
+            foreach (var uuidParents in parents)
             {
-                RemoveConnection(ParentUUID, uuid);
+                foreach (var item in dialogeNodes[uuidParents].children)
+                {
+                    foreach (var item2 in item.children)
+                    {
+                        if (item2.UUID.value == node.Uuid.Value)
+                        {
+                            item.children.Remove(item2);
+                            AddOrUpdateNode(node);
+                            break;
+                        }
+                    }
+                }
             }
-            if (dialogeNodes.ContainsKey(uuid))
+            foreach (var item in dialogeDictionary[currentContext.currentDialogeNodeUUID].Save.Regions.Dialog.Nodes)
             {
-                dialogeNodes.Remove(uuid);
+                foreach (var nodes in item.Node)
+                {
+                    if(node.Uuid.Value == nodes.Uuid.Value){
+                        Console.WriteLine("Found uuid to remove");
+                        item.Node.Remove(nodes);
+                        break;
+                    }
+                }
             }
+
+
         }
 
+        //todo
         private bool IsValidNode(NodeNode node)
         {
             return node != null && node.TaggedTexts != null && node.TaggedTexts.Count > 0;
@@ -311,28 +325,37 @@ namespace BGEdit
 
         public void UpdatePopLevel(NodeNode node, Int32 value)
         {
-            node.PopLevel ??= new TypeValPairInt32();
+            if (node == null) return;
+            node.PopLevel ??= new TypeValPairInt32("int32", value);
             node.PopLevel.Value = value;
             AddOrUpdateNode(node);
         }
 
         public void UpdateGroupID(NodeNode node, String groupID)
         {
+            if (node == null) return;
+            node.GroupID ??= new TypeValPairStr("FixedString",groupID);
             node.GroupID.Value = groupID;
             AddOrUpdateNode(node);
         }
         public void UpdateGroupIndex(NodeNode node, Int32 groupIndex)
         {
+            if (node == null) return;
+            node.GroupIndex ??= new TypeValPairInt32("int32",groupIndex);
             node.GroupIndex.Value = groupIndex;
             AddOrUpdateNode(node);
         }
         public void UpdateUUID(NodeNode node, String UUID)
         {
+            if (node == null) return;
+            node.Uuid ??= new TypeValPairStr("FixedString",UUID);
             node.Uuid.Value = UUID;
             AddOrUpdateNode(node);
         }
         public void UpdateConstructor(NodeNode node, String constructor)
         {
+            if (node == null) return;
+            node.Uuid ??= new TypeValPairStr("FixedString", constructor);
             node.Constructor.Value = constructor;
             AddOrUpdateNode(node);
         }
@@ -351,33 +374,42 @@ namespace BGEdit
 
         public void UpdateSpeaker(NodeNode node, Int32 speaker)
         {
+            if (node == null) return;
+
+            node.Speaker ??= new TypeValPairInt32("int32", speaker);
             node.Speaker.Value = speaker;
             AddOrUpdateNode(node);
+           
+            
         }
 
         public void UpdateOptionalCheckbox(NodeNode node, bool optional)
         {
+            if (node == null) return;
+
+            node.optional ??= new TypeValPairBool("bool", optional);
             node.optional.Value = optional;
             AddOrUpdateNode(node);
         }
 
         public void UpdateEndCheckBox(NodeNode node, bool endNode)
         {
+            if (node == null) return;
+
+            node.Endnode ??= new TypeValPairBool("bool", endNode);
             node.Endnode.Value = endNode;
             AddOrUpdateNode(node);
+
+
         }
 
         public void UpdateRootCheckBox(NodeNode node, bool rootNode)
         {
-            if (node.Root == null)
-            {
-                node.Root = new TypeValPairBool("bool",rootNode);
-            }
-            else
-            {
-                node.Root.Value = rootNode;
-            }
-           
+            if (node == null) return;
+
+            node.Root ??= new TypeValPairBool("bool", rootNode);
+            node.Root.Value = rootNode;
+
             AddOrUpdateNode(node);
         }
         
@@ -967,14 +999,39 @@ namespace BGEdit
 
         }
         //todo
-        public void RemoveConnectionInData()
+        public void RemoveConnectionInData(NodeNode from, NodeNode to)
         {
-
+            foreach (var child in from.children)
+            {
+                foreach(var child2 in to.children)
+                {
+                    foreach (var child3 in child2.children)
+                    {
+                        if (child3.UUID.value == to.Uuid.Value)
+                        {
+                            child2.children.Remove(child3);
+                            AddOrUpdateNode(from);
+                            return;
+                        }
+                    }
+                }
+            }
+           
         }
         //todo
-        public void RemoveNodeInData()
+        public void RemoveNodeInData(NodeNode from)
         {
-
+            foreach (var item in from.children)
+            {
+                foreach (var item2 in item.children)
+                {
+                    if (dialogeNodes.TryGetValue(item2.UUID.value, out var targetNode))
+                    {
+                        RemoveConnectionInData(from, targetNode);
+                    }
+                }
+            }
+            AddOrUpdateNode(from);
         }
 
         public void AddDialogueToBgData(NodeNode node)
