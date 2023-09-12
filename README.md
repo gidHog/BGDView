@@ -1,5 +1,5 @@
 # How to
-1. Extract all data with [BG3-Modders-Multitool](https://github.com/ShinyHobo/BG3-Modders-Multitool/releases) (unpack & decompress)
+1. Extract all data with [BG3-Modders-Multitool](https://github.com/ShinyHobo/BG3-Modders-Multitool/releases) (unpack,decompress if your using a newer version i might be nedded to change the file ending (lsf.lsx -> .lsx ...))
 2. The following folder structure is needed ("UnpackedData" name and path can be changed in the config):
 ```
 BGEdit.exe
@@ -33,6 +33,12 @@ UnpackedData/
 	4. "RelativeflagPaths" are the paths to tags and flags (currently treated almost the same)
 4. Run the .exe, or compile the code yourself
 5. Controls: Zoom with the mousewheel, drag with mouse, "copy to clipboard"/"save"-Button
+6. Limited edits should be possible<br>
+
+| BGDView  | NP++ |
+| ------------- | ------------- |
+|![NodeExample](https://github.com/gidHog/BGDView/assets/64482285/db1e1528-a9f2-4321-a9ff-50d61086f909)  | ![NodeExample2](https://github.com/gidHog/BGDView/assets/64482285/e1b38f18-22f5-4aaa-b143-d7eb4e4a9b34)  |
+
 ---
 # <span style="color:red">Disclaimer</span>
 
