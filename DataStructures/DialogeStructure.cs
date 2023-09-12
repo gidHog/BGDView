@@ -329,7 +329,7 @@ namespace BGEdit
         public TypeValPairBool optional { get; set; }
 
         [JsonProperty("speaker")]
-        public NextNodeId Speaker { get; set; }
+        public TypeValPairInt32 Speaker { get; set; }
         [JsonProperty("transitionmode")]
         public TypeValPairUInt8 Transitionmode { get; set; }
         [JsonProperty("jumptarget")]
@@ -506,7 +506,7 @@ namespace BGEdit
     public partial class TaggedTextTaggedText
     {
         [JsonProperty("HasTagRule")]
-        public IsAllowingJoinCombat HasTagRule { get; set; }
+        public TypeValPairBool HasTagRule { get; set; }
 
         [JsonProperty("RuleGroup")]
         public List<RuleGroup> RuleGroup { get; set; }

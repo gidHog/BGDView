@@ -1,15 +1,18 @@
 ﻿using BGEdit.LocalizationStructur;
 using BGEdit.SpeakerGroupsStructur;
+using Nodify;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using static Nodify.EditorGestures;
 
 namespace BGEdit
 {
@@ -99,6 +102,8 @@ namespace BGEdit
 
                 var tmpNode = new NodeViewModel
                 {
+                    AddChildVisible = "False",
+                    RemoveVisible = "False",
                     Title = "RootNode\n" + item.RootNodes.Value,
                     Input = new ObservableCollection<ConnectorViewModel>
                     {
@@ -490,7 +495,10 @@ namespace BGEdit
                         bgData.RemoveFlag(node, flagUUID.Text);
                         });
                     foundNode.CheckFlagEditable.Add(panel);
-                    if (!startUp) bgData.AddOrUpdateFlag(node, flagUUID.Text, flagType.Text, flagValue.IsChecked.Value, parVal, false);
+                    if (!startUp)
+                    {
+                        bgData.AddOrUpdateFlag(node, flagUUID.Text, flagType.Text, flagValue.IsChecked.Value, parVal, false);
+                    }
                 }
             }
         }
@@ -699,11 +707,9 @@ namespace BGEdit
             }
           
             PopulateNodeWithData(source, node, bgData, groupInfostoAdd, tagTextToAdd);
-           
-           
             AddNodeRecursion(node, bgData);
             GenericNodeActions.AddInfoToNodeView(node, AddedNodes[nUUID]);
-
+            
         }
 
         private void AddNodeRecursion(NodeNode node, BGData bgData)
@@ -796,6 +802,11 @@ namespace BGEdit
                 {
                     AddEditorData(node);
                 }),
+                RemoveNode = new DelegateCommand(() =>
+                {
+                    RemoveVisualNode(node);
+
+                }),
                 Input = new ObservableCollection<ConnectorViewModel>
                 {
                 new ConnectorViewModel
@@ -815,6 +826,32 @@ namespace BGEdit
                      }
             };
             AddedNodes[node.Uuid.Value].HeaderBrushColor = Color;
+        }
+
+        private void RemoveVisualNode(NodeNode node)
+        {
+            if (node?.Uuid?.Value == null || !AddedNodes.ContainsKey(node.Uuid.Value))
+                return;
+
+            bgData.RemoveNode(node);
+
+            NodeViewModel nodeViewModel = AddedNodes[node.Uuid.Value];
+            RemoveConnectionsFromNode(nodeViewModel.Input);
+            RemoveConnectionsFromNode(nodeViewModel.Output);
+
+            Nodes.Remove(nodeViewModel);
+            AddedNodes.Remove(node.Uuid.Value);
+        }
+
+        private void RemoveConnectionsFromNode(ObservableCollection<ConnectorViewModel> connections)
+        {
+            foreach (var connection in connections)
+            {
+                foreach (var conn in connection.connections)
+                {
+                    Connections.Remove(conn);
+                }
+            }
         }
 
         private void EditorViewModel_PropertyChangedType(object? sender, PropertyChangedEventArgs e)
@@ -927,6 +964,8 @@ namespace BGEdit
             {
                 Stroke = brush ?? Colorization.defaultBrush
             };
+            source.connections.Add(connection);
+            target.connections.Add(connection);
             if (!startUp)
             {
                 Console.WriteLine("Connected not in startup source UUID: "+source.parentUUID+" || target UUID:" +target.parentUUID);
@@ -942,6 +981,6 @@ namespace BGEdit
             }
             Connections.Add(connection);
         }
-
+        
     }
 }

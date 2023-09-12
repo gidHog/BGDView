@@ -1,23 +1,17 @@
-﻿using BGEdit;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using Newtonsoft.Json;
 using BGEdit.LocalizationStructur;
 using System.Windows;
-using Newtonsoft.Json.Linq;
 using BGEdit.GenericStructures;
-using System.Diagnostics.Eventing.Reader;
 using System.Windows.Input;
 using System.Text;
-using System.Reflection;
-using System.ComponentModel;
-using System.Security.Principal;
 using Microsoft.Win32;
 using System.Text.RegularExpressions;
 using BGEdit.SpeakerGroupsStructur;
-using System.Windows.Media.Animation;
+using System.Linq;
 
 namespace BGEdit
 {
@@ -104,7 +98,7 @@ namespace BGEdit
             node.children = new List<Children>();
             node.Constructor = new TypeValPairStr();
             node.EditorData = new List<EditorDataNode>();
-            node.Speaker = new NextNodeId();
+            node.Speaker = new TypeValPairInt32();
             node.Jumptarget = new Jumptarget();
             node.Root = new TypeValPairBool("bool", false);
             node.Endnode = new TypeValPairBool("bool", false);
@@ -182,25 +176,14 @@ namespace BGEdit
         }
         public bool AddOrUpdateNode(NodeNode node)
         {
-            try
+            if (node == null || node.Uuid == null)
             {
-                if (node != null )
-                {
-                    var uuid = node.Uuid.Value;
-                    if (!dialogeNodes.ContainsKey(uuid))
-                    {
-                        dialogeNodes.Add(uuid, node);
-                        return true;
-                    }
-                    dialogeNodes[uuid] = node;
-                    return true;
-                }
-               
-            }catch (Exception ex) { 
-                Console.WriteLine(ex.Message);
                 return false;
             }
-            return false;
+            var uuid = node.Uuid.Value;
+            dialogeNodes[uuid]= node;
+            
+            return true;
         }
 
         public void RemoveConnection(String UUIDFrom, String UUIDTo)
@@ -209,6 +192,7 @@ namespace BGEdit
             {
                 foreach (var children in dialogeNodes[UUIDFrom].children)
                 {
+                    if(children == null || children.children == null)
                     foreach(var child in children.children)
                     {
                         //found Connection
@@ -225,172 +209,153 @@ namespace BGEdit
 
         public void RemoveNode(NodeNode node)
         {
-            String uuid = node.Uuid.Value;
-            foreach (String ParentUUID in node.Parents)
+
+            Console.WriteLine("Rome Called " + node.Uuid.Value);
+            Console.WriteLine(dialogeNodes.Remove(node.Uuid.Value));
+            List<String> parents = node.Parents;
+            foreach (var uuidParents in parents)
             {
-                RemoveConnection(ParentUUID, uuid);
+                foreach (var item in dialogeNodes[uuidParents].children)
+                {
+                    foreach (var item2 in item.children)
+                    {
+                        if (item2.UUID.value == node.Uuid.Value)
+                        {
+                            item.children.Remove(item2);
+                            AddOrUpdateNode(node);
+                            break;
+                        }
+                    }
+                }
             }
-            if (dialogeNodes.ContainsKey(uuid))
+            foreach (var item in dialogeDictionary[currentContext.currentDialogeNodeUUID].Save.Regions.Dialog.Nodes)
             {
-                dialogeNodes.Remove(uuid);
+                foreach (var nodes in item.Node)
+                {
+                    if(node.Uuid.Value == nodes.Uuid.Value){
+                        Console.WriteLine("Found uuid to remove");
+                        item.Node.Remove(nodes);
+                        break;
+                    }
+                }
             }
+
+
         }
 
-        public void UpdateHasTagRule(NodeNode node, bool value, int index =0 )
+        //todo
+        private bool IsValidNode(NodeNode node)
         {
-            if (!(node == null
-               || node.TaggedTexts == null
-               || node.TaggedTexts.Count <= 0
-               || index < 0
-               || index >= node.TaggedTexts[0].TaggedText.Count
-               || node.TaggedTexts[0].TaggedText[index] == null
-               || node.TaggedTexts[0].TaggedText[index].HasTagRule == null))
+            return node != null && node.TaggedTexts != null && node.TaggedTexts.Count > 0;
+        }
+
+        private bool IsValidTaggedText(NodeNode node, int index)
+        {
+            return IsValidNode(node) && index >= 0 && index < node.TaggedTexts[0].TaggedText.Count && node.TaggedTexts[0].TaggedText[index] != null;
+        }
+
+        private bool IsValidRuleGroup(NodeNode node, int index, int rgIndex)
+        {
+            return IsValidTaggedText(node, index) && node.TaggedTexts[0].TaggedText[index].RuleGroup != null && rgIndex >= 0 && rgIndex < node.TaggedTexts[0].TaggedText[index].RuleGroup.Count;
+        }
+
+        private bool IsValidTagText(NodeNode node, int index, int tgIndex)
+        {
+            return IsValidTaggedText(node, index) && node.TaggedTexts[0].TaggedText[index].TagTexts != null && tgIndex >= 0 && tgIndex < node.TaggedTexts[0].TaggedText[index].TagTexts.Count;
+        }
+
+        private bool IsValidTagTextArray(NodeNode node, int index, int tgIndex, int tgArrayIndex)
+        {
+            return IsValidTagText(node, index, tgIndex) && node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray != null && tgArrayIndex >= 0 && tgArrayIndex < node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray.Count;
+        }
+
+        public void UpdateHasTagRule(NodeNode node, bool value, int index = 0)
+        {
+            if (IsValidTaggedText(node, index) && node.TaggedTexts[0].TaggedText[index].HasTagRule != null)
             {
                 node.TaggedTexts[0].TaggedText[index].HasTagRule.Value = value;
                 AddOrUpdateNode(node);
             }
-               
         }
 
-        public void UpdateTagCombineType(NodeNode node, String value, int index = 0, int rgIndex = 0)
+        public void UpdateTagCombineType(NodeNode node, string value, int index = 0, int rgIndex = 0)
         {
-            if (!(node == null
-            || node.TaggedTexts == null
-            || node.TaggedTexts.Count <= 0
-            || index < 0
-            || index >= node.TaggedTexts[0].TaggedText.Count
-            || node.TaggedTexts[0].TaggedText[index] == null
-            || node.TaggedTexts[0].TaggedText[index].RuleGroup == null
-            || rgIndex < 0
-            || rgIndex >= node.TaggedTexts[0].TaggedText[index].RuleGroup.Count
-            || node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex] == null
-            || node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex].TagCombineOp == null))
+            if (IsValidRuleGroup(node, index, rgIndex) && node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex].TagCombineOp != null)
             {
-
                 node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex].TagCombineOp.Type = value;
                 AddOrUpdateNode(node);
             }
-
         }
 
         public void UpdateTagCombineValue(NodeNode node, byte value, int index = 0, int rgIndex = 0)
         {
-            if (!(node == null
-                || node.TaggedTexts == null
-                || node.TaggedTexts.Count <= 0
-                || index < 0
-                || index >= node.TaggedTexts[0].TaggedText.Count
-                || node.TaggedTexts[0].TaggedText[index] == null
-                || node.TaggedTexts[0].TaggedText[index].RuleGroup == null
-                || rgIndex < 0
-                || rgIndex >= node.TaggedTexts[0].TaggedText[index].RuleGroup.Count
-                || node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex] == null
-                || node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex].TagCombineOp == null))
+            if (IsValidRuleGroup(node, index, rgIndex) && node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex].TagCombineOp != null)
             {
                 node.TaggedTexts[0].TaggedText[index].RuleGroup[rgIndex].TagCombineOp.Value = value;
                 AddOrUpdateNode(node);
             }
-
-         
         }
 
-        public void UpdateLineUUIDNumber(NodeNode node, String value,int index = 0, int tgIndex = 0, int tgArrayIndex = 0)
+        public void UpdateLineUUIDNumber(NodeNode node, string value, int index = 0, int tgIndex = 0, int tgArrayIndex = 0)
         {
-            if (!(node == null
-                || node.TaggedTexts == null
-                || node.TaggedTexts.Count <= 0
-                || index < 0
-                || index >= node.TaggedTexts[0].TaggedText.Count
-                || node.TaggedTexts[0].TaggedText[index] == null
-                || node.TaggedTexts[0].TaggedText[index].TagTexts == null
-                || tgIndex < 0
-                || tgIndex >= node.TaggedTexts[0].TaggedText[index].TagTexts.Count
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex] == null
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray == null
-                || tgArrayIndex < 0
-                || tgArrayIndex >= node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray.Count
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex] == null
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].LineId == null))
+            if (IsValidTagTextArray(node, index, tgIndex, tgArrayIndex) && node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].LineId != null)
             {
                 node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].LineId.Value = value;
                 AddOrUpdateNode(node);
             }
-
-           
         }
 
-        public void UpdateLocalisationUUID(NodeNode node, String value, int index = 0, int tgIndex = 0, int tgArrayIndex = 0)
+        public void UpdateLocalisationUUID(NodeNode node, string value, int index = 0, int tgIndex = 0, int tgArrayIndex = 0)
         {
-            if (!(node == null
-            || node.TaggedTexts == null
-            || node.TaggedTexts.Count <= 0
-            || index < 0
-            || index >= node.TaggedTexts[0].TaggedText.Count
-            || node.TaggedTexts[0].TaggedText[index] == null
-            || node.TaggedTexts[0].TaggedText[index].TagTexts == null
-            || tgIndex < 0
-            || tgIndex >= node.TaggedTexts[0].TaggedText[index].TagTexts.Count
-            || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex] == null
-            || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray == null
-            || tgArrayIndex < 0
-            || tgArrayIndex >= node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray.Count
-            || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex] == null
-            || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].LineId == null))
+            if (IsValidTagTextArray(node, index, tgIndex, tgArrayIndex) && node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].TagText.Handle != null)
             {
                 node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].TagText.Handle = value;
                 AddOrUpdateNode(node);
             }
-
-               
         }
+
         public void UpdateIsStub(NodeNode node, bool value, int index = 0, int tgIndex = 0, int tgArrayIndex = 0)
         {
-            if (!(node == null
-                || node.TaggedTexts == null
-                || node.TaggedTexts.Count <= 0
-                || index < 0
-                || index >= node.TaggedTexts[0].TaggedText.Count
-                || node.TaggedTexts[0].TaggedText[index] == null
-                || node.TaggedTexts[0].TaggedText[index].TagTexts == null
-                || tgIndex < 0
-                || tgIndex >= node.TaggedTexts[0].TaggedText[index].TagTexts.Count
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex] == null
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray == null
-                || tgArrayIndex < 0
-                || tgArrayIndex >= node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray.Count
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex] == null
-                || node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].Stub == null))
+            if (IsValidTagTextArray(node, index, tgIndex, tgArrayIndex) && node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].Stub != null)
             {
                 node.TaggedTexts[0].TaggedText[index].TagTexts[tgIndex].TagTextArray[tgArrayIndex].Stub.Value = value;
                 AddOrUpdateNode(node);
             }
-            
         }
 
         public void UpdatePopLevel(NodeNode node, Int32 value)
         {
-            node.PopLevel ??= new TypeValPairInt32();
+            if (node == null) return;
+            node.PopLevel ??= new TypeValPairInt32("int32", value);
             node.PopLevel.Value = value;
             AddOrUpdateNode(node);
         }
 
         public void UpdateGroupID(NodeNode node, String groupID)
         {
+            if (node == null) return;
+            node.GroupID ??= new TypeValPairStr("FixedString",groupID);
             node.GroupID.Value = groupID;
             AddOrUpdateNode(node);
         }
         public void UpdateGroupIndex(NodeNode node, Int32 groupIndex)
         {
+            if (node == null) return;
+            node.GroupIndex ??= new TypeValPairInt32("int32",groupIndex);
             node.GroupIndex.Value = groupIndex;
             AddOrUpdateNode(node);
         }
         public void UpdateUUID(NodeNode node, String UUID)
         {
+            if (node == null) return;
+            node.Uuid ??= new TypeValPairStr("FixedString",UUID);
             node.Uuid.Value = UUID;
             AddOrUpdateNode(node);
         }
         public void UpdateConstructor(NodeNode node, String constructor)
         {
+            if (node == null) return;
+            node.Uuid ??= new TypeValPairStr("FixedString", constructor);
             node.Constructor.Value = constructor;
             AddOrUpdateNode(node);
         }
@@ -409,33 +374,42 @@ namespace BGEdit
 
         public void UpdateSpeaker(NodeNode node, Int32 speaker)
         {
+            if (node == null) return;
+
+            node.Speaker ??= new TypeValPairInt32("int32", speaker);
             node.Speaker.Value = speaker;
             AddOrUpdateNode(node);
+           
+            
         }
 
         public void UpdateOptionalCheckbox(NodeNode node, bool optional)
         {
+            if (node == null) return;
+
+            node.optional ??= new TypeValPairBool("bool", optional);
             node.optional.Value = optional;
             AddOrUpdateNode(node);
         }
 
         public void UpdateEndCheckBox(NodeNode node, bool endNode)
         {
+            if (node == null) return;
+
+            node.Endnode ??= new TypeValPairBool("bool", endNode);
             node.Endnode.Value = endNode;
             AddOrUpdateNode(node);
+
+
         }
 
         public void UpdateRootCheckBox(NodeNode node, bool rootNode)
         {
-            if (node.Root == null)
-            {
-                node.Root = new TypeValPairBool("bool",rootNode);
-            }
-            else
-            {
-                node.Root.Value = rootNode;
-            }
-           
+            if (node == null) return;
+
+            node.Root ??= new TypeValPairBool("bool", rootNode);
+            node.Root.Value = rootNode;
+
             AddOrUpdateNode(node);
         }
         
@@ -593,7 +567,6 @@ namespace BGEdit
                     if (item2.UUID.Value == flagUUID)
                     {
                         Console.WriteLine("Found flag!");
-                        foundFlag = true;
                         item2.paramval.Value = paramval;
                         item2.value.Value = value;
                         foundFlag = true;
@@ -657,71 +630,59 @@ namespace BGEdit
        
         private const string splitTagOn = "#SplitSeperator#";
         private bool merge = false;
-        public void LoadTags(String[] tagsPaths)
+        public void LoadTags(string[] tagsPaths)
         {
             Console.WriteLine("Loading Flags");
-            foreach (String tagPath in tagsPaths) {
-                string[] files = Directory.GetFiles(tagPath);
+            foreach (string tagPath in tagsPaths)
+            {
+                string[] files = Directory.GetFiles(tagPath).Where(file => !file.Contains("lsf")).ToArray();
+
                 foreach (string file in files)
                 {
-                    if (!file.Contains("lsf")) {  
-                        XmlDocument doc = new XmlDocument();
-                        doc.Load(file);
-                        string jsonText = JsonConvert.SerializeXmlNode(doc);
-                        if (merge)
-                        {
-                            string fileName = "merged.json";
-                            try
-                            {
-                                using (StreamWriter writer = File.AppendText(fileName))
-                                {
-                                    writer.Write(jsonText + splitTagOn);
-                                }
-                            }
-                            catch (Exception exp)
-                            {
-                                Console.Write(exp.Message);
-                            }
-                        }
-               
-
-                        BGEdit.TagStructur.TagStructurRoot TagStructurRoot = BGEdit.TagStructur.TagStructurRoot.FromJson(jsonText);
-                        foreach (var item in TagStructurRoot.Save.Region.Node.Attribute)
-                        {
-                            if (TagStructurRoot.attributes.ContainsKey(item.Id))
-                            {
-                                TagStructurRoot.attributes[item.Id] = item;
-                            }
-                            else
-                            {
-                                TagStructurRoot.attributes.Add(item.Id, item);
-                            }
-                       
-                        }
-                        if (!tagData.ContainsKey(file.Substring(0, file.IndexOf('.')).Replace(tagPath + "\\", "")))
-                        {
-                            tagData.Add(file.Substring(0, file.IndexOf('.')).Replace(tagPath + "\\", ""), TagStructurRoot);
-                        }
-                        else
-                        {
-                            tagData[file.Substring(0, file.IndexOf('.')).Replace(tagPath + "\\", "")] =  TagStructurRoot;
-                        }
-                 
-                   
-                        if (!tagData.ContainsKey(TagStructurRoot.attributes["UUID"].Value))
-                        {              
-                            tagData.Add(TagStructurRoot.attributes["UUID"].Value, TagStructurRoot);
-                        }
-                        else
-                        {
-                             tagData[TagStructurRoot.attributes["UUID"].Value]= TagStructurRoot;
-                        }
-                 
+                    string jsonText = ConvertXmlToJson(file);
+                    if (merge)
+                    {
+                        AppendTextToFile("merged.json", jsonText + splitTagOn);
                     }
-      
+
+                    BGEdit.TagStructur.TagStructurRoot tagStructurRoot = BGEdit.TagStructur.TagStructurRoot.FromJson(jsonText);
+                    UpdateAttributes(tagStructurRoot);
+
+                    string trimmedFilePath = file.Substring(0, file.LastIndexOf('.')).Replace(tagPath + "\\", "");
+                    tagData[trimmedFilePath] = tagStructurRoot;
+                    tagData[tagStructurRoot.attributes["UUID"].Value] = tagStructurRoot;
                 }
             }
+        }
 
+        private string ConvertXmlToJson(string filePath)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.Load(filePath);
+            return JsonConvert.SerializeXmlNode(doc);
+        }
+
+        private void AppendTextToFile(string fileName, string text)
+        {
+            try
+            {
+                using (StreamWriter writer = File.AppendText(fileName))
+                {
+                    writer.Write(text);
+                }
+            }
+            catch (Exception exp)
+            {
+                Console.Write(exp.Message);
+            }
+        }
+
+        private void UpdateAttributes(BGEdit.TagStructur.TagStructurRoot tagStructurRoot)
+        {
+            foreach (var item in tagStructurRoot.Save.Region.Node.Attribute)
+            {
+                tagStructurRoot.attributes[item.Id] = item;
+            }
         }
         public void LoadLocalization(String path)
         {
@@ -1038,14 +999,39 @@ namespace BGEdit
 
         }
         //todo
-        public void RemoveConnectionInData()
+        public void RemoveConnectionInData(NodeNode from, NodeNode to)
         {
-
+            foreach (var child in from.children)
+            {
+                foreach(var child2 in to.children)
+                {
+                    foreach (var child3 in child2.children)
+                    {
+                        if (child3.UUID.value == to.Uuid.Value)
+                        {
+                            child2.children.Remove(child3);
+                            AddOrUpdateNode(from);
+                            return;
+                        }
+                    }
+                }
+            }
+           
         }
         //todo
-        public void RemoveNodeInData()
+        public void RemoveNodeInData(NodeNode from)
         {
-
+            foreach (var item in from.children)
+            {
+                foreach (var item2 in item.children)
+                {
+                    if (dialogeNodes.TryGetValue(item2.UUID.value, out var targetNode))
+                    {
+                        RemoveConnectionInData(from, targetNode);
+                    }
+                }
+            }
+            AddOrUpdateNode(from);
         }
 
         public void AddDialogueToBgData(NodeNode node)

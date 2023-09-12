@@ -1,10 +1,12 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 
 namespace BGEdit
 {
     public class ConnectorViewModel : INotifyPropertyChanged
     {
+        public List<ConnectionViewModel> connections = new List<ConnectionViewModel>();
         private Point _anchor;
         public Point Anchor
         {

@@ -27,6 +27,8 @@ namespace BGEdit
         public ObservableCollection<StackPanel> EditorDataEditable { get; set; } = new ObservableCollection<StackPanel>();
         public ObservableCollection<StackPanel> TaggedTextDataEditable { get; set; } = new ObservableCollection<StackPanel>();
         public Brush HeaderBrushColor { get; set; } = new SolidColorBrush(Colors.DimGray);
+        public String AddChildVisible { get; set; } = "True";
+        public String RemoveVisible { get; set; } = "True";
         public ICommand AddChildren { get; set; } = new DelegateCommand(() =>
         {
             Console.WriteLine("Default");
@@ -35,6 +37,11 @@ namespace BGEdit
         {
             Console.WriteLine("AddEditorData default");
         });
+        public ICommand RemoveNode { get; set; } = new DelegateCommand(() =>
+        {
+            Console.WriteLine("Remove node default");
+        });
+       
         public string RootsFound { get; set; } = "Hidden";
         public string GroupsFound { get; set; } = "Hidden";
         public string TagsFound { get; set; } = "Hidden";
@@ -262,6 +269,7 @@ namespace BGEdit
         public NodeViewModel()
         {
             EditorDataEditable.CollectionChanged += items_CollectionChanged;
+            
         }
 
     }

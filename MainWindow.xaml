@@ -47,7 +47,7 @@
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <nodify:NodifyEditor Grid.RowSpan="3" ViewportLocation="{Binding ViewportLocation}"  ItemsSource="{Binding Nodes}"  Connections="{Binding Connections}" PendingConnection="{Binding PendingConnection}" DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}">
+        <nodify:NodifyEditor Grid.RowSpan="3"  ViewportLocation="{Binding ViewportLocation}"  ItemsSource="{Binding Nodes}"  Connections="{Binding Connections}" PendingConnection="{Binding PendingConnection}" DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}">
             <!-- Set context -->
             <nodify:NodifyEditor.DataContext>
                 <local:EditorViewModel />
@@ -92,7 +92,8 @@
                                     <TextBox Text="{Binding UUID}" Background="{Binding HeaderBrushColor}" IsReadOnly="True" TextAlignment="Center"></TextBox>
                                   
                                 </StackPanel>
-                                <Button Command="{Binding AddChildren}">Add Children</Button>
+                                <Button Command="{Binding AddChildren}" IsEnabled="{Binding AddChildVisible}" Visibility="{Binding AddChildVisible}">Add child</Button>
+                                <Button Command="{Binding RemoveNode}" IsEnabled="{Binding RemoveVisible}" Visibility="{Binding RemoveVisible}">Remove node</Button>
                             </StackPanel>
                         </nodify:Node.Header>
                         <nodify:Node.InputConnectorTemplate>
@@ -285,13 +286,25 @@
               IsExpanded="True"
               ExpandDirection="Left"
               Padding="3 1 1 3">
-            <StackPanel>
-                <Button Name="SaveButton" DataContext="{Binding Source={x:Static local:BGData.Instance}}" Command="{Binding Save}">
-                    Save
-                </Button>
-                <Button Name="CopyToClipButton" DataContext="{Binding Source={x:Static local:BGData.Instance}}" Command="{Binding CopyToClip}">
-                    Copy to Clipboard
-                </Button>
+            <StackPanel >
+                <Border Background="SlateGray" BorderBrush="Black">
+                    <StackPanel>
+                        <Button Name="SaveButton" DataContext="{Binding Source={x:Static local:BGData.Instance}}" Command="{Binding Save}">
+                            Save
+                        </Button>
+                        <Button Name="CopyToClipButton" DataContext="{Binding Source={x:Static local:BGData.Instance}}" Command="{Binding CopyToClip}">
+                            Copy to Clipboard
+                        </Button>
+                    </StackPanel>
+                </Border>
+                <!--<Border Background="SlateGray" BorderBrush="Black">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock>Search</TextBlock>
+                        <TextBox Width="256"></TextBox>
+                        <Button>🡐</Button>
+                        <Button>🡒</Button>
+                    </StackPanel>
+                </Border>  -->
             </StackPanel>
         </Expander>
     </Grid>
