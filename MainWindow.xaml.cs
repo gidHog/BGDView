@@ -18,6 +18,7 @@ namespace BGEdit
             InitializeComponent();
             window = this;
         }
+
     }
     public interface INodifyCommand : ICommand
     {
