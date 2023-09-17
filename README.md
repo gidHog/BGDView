@@ -33,11 +33,11 @@ UnpackedData/
 	4. "RelativeflagPaths" are the paths to tags and flags (currently treated almost the same)
 4. Run the .exe, or compile the code yourself
 5. Controls: Zoom with the mousewheel, drag with mouse, "copy to clipboard"/"save"-Button
-6. Limited edits should be possible<br>
+6. Limited edits should be possible<br> (For selecting the current node in the UI, you need to move it)
 
 | BGDView  | NP++ |
 | ------------- | ------------- |
-|![NodeExample](https://github.com/gidHog/BGDView/assets/64482285/db1e1528-a9f2-4321-a9ff-50d61086f909)  | ![NodeExample2](https://github.com/gidHog/BGDView/assets/64482285/e1b38f18-22f5-4aaa-b143-d7eb4e4a9b34)  |
+|![UI](https://github.com/gidHog/BGDView/assets/64482285/e16e58ec-84f0-41f9-b072-5989e18bbd12) | ![NodeExample2](https://github.com/gidHog/BGDView/assets/64482285/e1b38f18-22f5-4aaa-b143-d7eb4e4a9b34)  |
 
 ---
 # <span style="color:red">Disclaimer</span>
@@ -45,7 +45,7 @@ UnpackedData/
 1. This is a early and incomplete version, things may not work or be displayed incorrect
    - Not everything is displayed
    - Not everything is editable
-   - Currently you can only add nodes and connections and not remove them
+   - Currently you need to move the node to display it in the UI
 3. Loading takes longer with Windows-Defender enabled (M.2 SSD: ~10 vs ~100+ seconds)
 4. The code is kinda messy
 
