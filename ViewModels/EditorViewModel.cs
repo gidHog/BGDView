@@ -56,7 +56,6 @@ namespace BGEdit
            
         });
 
-
         private NodeViewModel _CurrentNodeViewModel;
         public NodeViewModel CurrentNodeViewModel
         {
@@ -81,7 +80,20 @@ namespace BGEdit
 
         private BGData bgData = BGData.Instance;
         private bool startUp = true;
-        public static EditorViewModel instance;
+
+        private static EditorViewModel? _instance;
+        public static EditorViewModel instance
+        {
+            set
+            {
+                _instance = value;
+            }
+            get
+            {
+                if (_instance == null) _instance = new EditorViewModel();
+                return _instance;
+            }
+        }
         public EditorViewModel()
         {
             PendingConnection = new PendingConnectionViewModel(this);

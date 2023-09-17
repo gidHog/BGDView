@@ -6,7 +6,7 @@
         xmlns:nodify="https://miroiu.github.io/nodify"
         xmlns:local="clr-namespace:BGEdit"
         mc:Ignorable="d"
-        Title="BGDView v0.1.0" Height="450" Width="800">
+        Title="BGDView v0.1.2" Height="450" Width="800">
     <!-- Set 
     
         <Window.InputBindings>
