@@ -29,11 +29,18 @@ namespace BGEdit
 
     public static partial class GenericNodeActions
     {
-        private static readonly float PosY = 1.3f, PosX = 1.8f;
+        private static readonly float PosY = 1f, PosX = 1.5f;
+
+        public static double width = 0, height =0;
         public static void AddTextToNode(ObservableCollection<String> list, String text)
         {
             list ??= new ObservableCollection<String>();
             list.Add(text);
+        }
+
+        public static Point GetCenterOffset()
+        {
+            return new Point(width/2.0,height/2.0);
         }
         public static Border AddBorderToStack(UIElement element)
         {

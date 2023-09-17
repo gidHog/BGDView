@@ -20,8 +20,8 @@ namespace BGEdit
         public ObservableCollection<string> TagList { get; set; } = new ObservableCollection<string>();
         public ObservableCollection<string> SpeakerList { get; set; } = new ObservableCollection<string>();
         public ObservableCollection<string> GroupList { get; set; } = new ObservableCollection<string>();
-        public ObservableCollection<string> TagTextList { get; set; } = new ObservableCollection<string>();
-        public ObservableCollection<string> TagSetList { get; set; } = new ObservableCollection<string>();
+        public ObservableCollection<TextBox> TagTextList { get; set; } = new ObservableCollection<TextBox>();
+        public ObservableCollection<String> TagSetList { get; set; } = new ObservableCollection<String>();
         public ObservableCollection<StackPanel> SetFlagEditable { get; set; } = new ObservableCollection<StackPanel>();
         public ObservableCollection<StackPanel> CheckFlagEditable { get; set; } = new ObservableCollection<StackPanel>();
         public ObservableCollection<StackPanel> EditorDataEditable { get; set; } = new ObservableCollection<StackPanel>();
@@ -41,7 +41,12 @@ namespace BGEdit
         {
             Console.WriteLine("Remove node default");
         });
-       
+ 
+        
+        public void MouseButtonDownHandler(object sender, MouseButtonEventArgs e)
+        {
+            Console.Write("Clicked");
+        }
         public string RootsFound { get; set; } = "Hidden";
         public string GroupsFound { get; set; } = "Hidden";
         public string TagsFound { get; set; } = "Hidden";
@@ -49,6 +54,18 @@ namespace BGEdit
         public string TagTextFound { get; set; } = "Hidden";
         public string TagsToSetFound { get; set; } = "Hidden";
         private Point _location;
+
+        private bool _IsSelected = false;
+
+        public bool IsSelected
+        {
+            set
+            {
+                _IsSelected = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+            }
+            get => _IsSelected;
+        }
         public Point Location
         {
             set
@@ -269,7 +286,8 @@ namespace BGEdit
         public NodeViewModel()
         {
             EditorDataEditable.CollectionChanged += items_CollectionChanged;
-            
+
+
         }
 
     }

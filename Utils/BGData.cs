@@ -501,52 +501,39 @@ namespace BGEdit
                 flaggroup = node.Checkflags[0].flaggroup ?? new List<Flaggroup>();
                 node.Checkflags[0].flaggroup = flaggroup;
             }
-            if (node.Checkflags != null && flaggroup != null)
+            if (flaggroup != null)
             {
                 foreach (var item in flaggroup)
                 {
-                    if (item.flag.Count <= 1 && item.flag[0].UUID.Value == flagUUID)
+                    if (item.flag == null) break;
+                    foreach (var item2 in item.flag)
+                    {
+                        if (item2.UUID.Value == flagUUID)
+                        {   
+                            item.flag.Remove(item2);
+                            break;
+                        }
+                               
+                    }
+                    if(item.flag.Count == 0)
                     {
                         flaggroup.Remove(item);
-                        if (isSet)
-                        {
-                            node.Setflags = new List<Flags>
-                            {
-                                new Flags()
-                            };
-                        }
-                        else
-                        {
-                            node.Checkflags = new List<Checkflag>
-                            {
-                                new Checkflag()
-                            };
-                            
-                        }
                         break;
-                    }
-                    else
-                    {
-                        foreach (var item2 in item.flag)
-                        {
-                            if (item2.UUID.Value == flagUUID)
-                            {   
-                                item.flag.Remove(item2);
-                                break;
-                            }
-                               
-                        }
                     }
                 }
             }
-            
             AddOrUpdateNode(node);
         }  
-        public void AddOrUpdateFlag(NodeNode node, String flagUUID,String type,bool value, Int32 paramval, bool isSet = false)
+        public void AddOrUpdateFlag(NodeNode node, String flagUUID,String type,bool value, Int32 paramval, bool isSet = false,String oldVal = "")
         {
             List<Flaggroup> flaggroup;
             Flaggroup newFlag = new Flaggroup();
+            if (flagUUID != oldVal)
+            {
+                Console.WriteLine(flagUUID+" || "+oldVal);
+                RemoveFlag(node, oldVal, isSet);
 
+            }
             if (isSet)
             {
                 flaggroup = node.Setflags[0].flaggroup ?? new List<Flaggroup>();
@@ -557,7 +544,7 @@ namespace BGEdit
                 flaggroup = node.Checkflags[0].flaggroup ?? new List<Flaggroup>();
                 node.Checkflags[0].flaggroup = flaggroup;
             }
-
+          
             bool foundFlag = false;
          
             foreach (var item in flaggroup)
