@@ -6,7 +6,7 @@
         xmlns:nodify="https://miroiu.github.io/nodify"
         xmlns:local="clr-namespace:BGEdit"
         mc:Ignorable="d"
-        Title="BGDView v0.1.2" Height="450" Width="800">
+        Title="BGDView v0.2.0" Height="450" Width="800">
     <!-- Set 
     
         <Window.InputBindings>
@@ -60,7 +60,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <nodify:NodifyEditor Grid.RowSpan="2"  ViewportLocation="{Binding ViewportLocation}"  ItemsSource="{Binding Nodes}"  Connections="{Binding Connections}" PendingConnection="{Binding PendingConnection}" DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}" Grid.ColumnSpan="2">
+        <nodify:NodifyEditor Grid.RowSpan="2" ViewportZoom="{Binding ViewportZoom}" ViewportLocation="{Binding ViewportLocation}"  ItemsSource="{Binding Nodes}"  Connections="{Binding Connections}" PendingConnection="{Binding PendingConnection}" DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}" Grid.ColumnSpan="2">
             <!-- Set context -->
             <nodify:NodifyEditor.DataContext>
                 <local:EditorViewModel />
@@ -86,17 +86,17 @@
             <!-- Style for node -->
             <nodify:NodifyEditor.ItemContainerStyle>
                 <Style TargetType="{x:Type nodify:ItemContainer}">
-                    <Setter Property="Location" 
-                    Value="{Binding Location}"/>
-
+                    <Setter Property="Location" Value="{Binding Location}"/>
+                    <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
                     <Style.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Panel.ZIndex" Value="1" />
                         </Trigger>
-
+                        
                     </Style.Triggers>
                 </Style>
             </nodify:NodifyEditor.ItemContainerStyle>
+       
 
             <!-- Node-Templates for the edítor -->
             <nodify:NodifyEditor.ItemTemplate>
@@ -130,7 +130,7 @@
                                 <nodify:NodeOutput Header="{Binding Title}" IsConnected="{Binding IsConnected}" Anchor="{Binding Anchor, Mode=OneWayToSource}"/>
                             </DataTemplate>
                         </nodify:Node.OutputConnectorTemplate>
-
+               
                         <StackPanel>
                             <Border Background="Transparent" BorderBrush="White" BorderThickness="1" Visibility="{Binding RootsFound}">
                                 <ItemsControl ItemsSource="{Binding RootList}">
@@ -199,6 +199,9 @@
 
             </nodify:NodifyEditor.ItemTemplate>
         </nodify:NodifyEditor>
+     
+
+
         <Expander Grid.Row="1"
               HorizontalContentAlignment="Stretch"
               VerticalContentAlignment="Stretch"
@@ -209,7 +212,7 @@
               ExpandDirection="Left"
               Padding="3 1 1 3" Grid.ColumnSpan="2">
 
-            <DockPanel DataContext="{Binding Source={x:Static local:EditorViewModel.instance}}">
+            <DockPanel DataContext="{Binding Source={x:Static local:EditorViewModel.Instance}}">
 
 
                 <StackPanel  DockPanel.Dock="Top">
@@ -222,7 +225,12 @@
                             <StackPanel>
                                 <Button Content="Selected node" Command="{Binding JumpToNode}"></Button>
                                 <Button Content="Show jump" Command="{Binding ToggleJump}"></Button>
+                                <Button Content="Flags" Command="{Binding OpenPopup_Flag}"/>
                             </StackPanel>
+                           <!-- <StackPanel>
+                                <Button Content="Search"></Button>
+                            </StackPanel>
+                           -->
                         </StackPanel>
 
                     </Border>
@@ -286,6 +294,7 @@
                         <StackPanel>
                             <!-- checkFlags-->
                             <TextBlock>Check Flags</TextBlock>
+                      
                             <StackPanel>
                                 <ItemsControl ItemsSource="{Binding CurrentNodeViewModel.CheckFlagEditable}" >
                                     <ItemsControl.ItemsPanel>

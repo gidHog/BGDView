@@ -12,6 +12,16 @@ using Microsoft.Win32;
 using System.Text.RegularExpressions;
 using BGEdit.SpeakerGroupsStructur;
 using System.Linq;
+using System.DirectoryServices;
+using BGEdit.Utils;
+using System.Windows.Documents;
+using System.Collections;
+using BGEdit.TagStructur;
+using System.Data.SqlTypes;
+using System.Xml.Linq;
+using LSLib.LS;
+using LSLib.LS.Enums;
+using System.Windows.Shapes;
 
 namespace BGEdit
 {
@@ -25,6 +35,19 @@ namespace BGEdit
         AnswerAlias,
         Group,
         Unknown
+    }
+    public enum SearchType
+    {
+        MatchCase = 0
+
+    }
+    public enum SearchLocation
+    {
+        LogicalName = 0,
+        UUID = 1,
+        Text = 2,
+        Flags = 3,
+        Tags = 4
     }
     //In what context is the data currently?: Later dictionary with every context and switchable if multiple instances are used.
 
@@ -51,7 +74,6 @@ namespace BGEdit
         public Dictionary<string, NodeNode> dialogeNodes = new Dictionary<string, NodeNode>();
         public Dictionary<string, Dictionary<string, string>> editorData = new Dictionary<string, Dictionary<string, string>>();
         public Dictionary<string, BGEdit.TagStructur.TagStructurRoot> tagData = new Dictionary<string, BGEdit.TagStructur.TagStructurRoot>();
-
         public Dictionary<string, Dictionary<string, Speaker>> speakerList = new Dictionary<string, Dictionary<string, Speaker>>();
         public Dictionary<string, Dictionary<string, string>> speakerGroups = new Dictionary<string, Dictionary<string, string>>();
         public Dictionary<string, BGEdit.MergedCharsStructure.Node> mergedCharData= new Dictionary<string, BGEdit.MergedCharsStructure.Node>();
@@ -322,7 +344,7 @@ namespace BGEdit
                 AddOrUpdateNode(node);
             }
         }
-
+        // End todo
         public void UpdatePopLevel(NodeNode node, Int32 value)
         {
             if (node == null) return;
@@ -490,7 +512,6 @@ namespace BGEdit
         {
           
             List<Flaggroup> flaggroup;
-
             if (isSet)
             {
                 flaggroup = node.Setflags[0].flaggroup ?? new List<Flaggroup>();
@@ -551,7 +572,7 @@ namespace BGEdit
             {
                 foreach (var item2 in item.flag)
                 {
-                    if (item2.UUID.Value == flagUUID)
+                    if (item2.UUID.Value == flagUUID && item2.paramval!= null)
                     {
                         Console.WriteLine("Found flag!");
                         item2.paramval.Value = paramval;
@@ -585,22 +606,33 @@ namespace BGEdit
         }
         public String getTagData(String value)
         {
-            String res = "\n";
+            String res = "";
                                     
             if (tagData.ContainsKey(value))
+
             {
-                if(tagData[value].attributes["Description"].Value!= "")
+                Tags tmpTag;
+                if (tagData[value].save.regions.RegTags != null)
                 {
-                    res += tagData[value].attributes["Description"].Value;
+                    tmpTag = tagData[value].save.regions.RegTags;
+                }
+                else
+                {
+                    tmpTag = tagData[value].save.regions.RegFlags;
+                }
+
+                if (tmpTag.Description.Value!= "")
+                {
+                    res += tmpTag.Description.Value;
                    
-                }else if (tagData[value].attributes["Name"].Value != "")
+                }else if (tmpTag.Name.Value != "")
                 {
-                    res += tagData[value].attributes["Name"].Value;
+                    res += tmpTag.Name.Value;
                   
                 }
-                else if (tagData[value].attributes["DisplayName"].Handle != "")
+                else if (tmpTag.DisplayName.handle != "")
                 {
-                    res += tagData[value].attributes["DisplayName"].Handle;
+                    res += tmpTag.DisplayName.handle;
                 }
                 else
                 {
@@ -614,38 +646,74 @@ namespace BGEdit
             }
             return res;
         }
-       
-        private const string splitTagOn = "#SplitSeperator#";
-        private bool merge = false;
+
         public void LoadTags(string[] tagsPaths)
         {
-            Console.WriteLine("Loading Flags");
-            foreach (string tagPath in tagsPaths)
-            {
-                string[] files = Directory.GetFiles(tagPath).Where(file => !file.Contains("lsf")).ToArray();
-
-                foreach (string file in files)
+        
+            try {
+                var conversionParams = ResourceConversionParameters.FromGameVersion(Game.BaldursGate3);
+                var writer = new LSJWriterFixed2String();
+                writer.PrettyPrint = conversionParams.PrettyPrint;
+                conversionParams.ToSerializationSettings(writer.SerializationSettings);
+                if (config.Config.UseMergedFlags.Value)
                 {
-                    string jsonText = ConvertXmlToJson(file);
-                    if (merge)
+                    try
                     {
-                        AppendTextToFile("merged.json", jsonText + splitTagOn);
-                    }
 
-                    BGEdit.TagStructur.TagStructurRoot tagStructurRoot = BGEdit.TagStructur.TagStructurRoot.FromJson(jsonText);
-                    UpdateAttributes(tagStructurRoot);
-
-                    string trimmedFilePath = file.Substring(0, file.LastIndexOf('.')).Replace(tagPath + "\\", "");
-                    tagData[trimmedFilePath] = tagStructurRoot;
-                    tagData[tagStructurRoot.attributes["UUID"].Value] = tagStructurRoot;
+                
+                        Console.WriteLine("Loading Flags merged");
+                        var result = JsonConvert.DeserializeObject<Dictionary<string, TagStructurRoot>>(System.IO.File.ReadAllText("mergedTags.txt"));
+                        if(result != null)
+                        {
+                            tagData = result;
+                            return;
+                        }
+                    }catch (Exception ex) { }
                 }
+                Console.WriteLine("Loading Flags");
+                foreach (string tagPath in tagsPaths)
+                {
+                    string[] files = System.IO.Directory.GetFiles(tagPath).Where(file => !file.Contains("lsf")).ToArray();
+
+                    foreach (string file in files)
+                    {
+                                
+                        Resource resource = ResourceUtils.LoadResource(file, ResourceLoadParameters.FromGameVersion(Game.BaldursGate3));
+                             
+                        //Console.WriteLine(writer.LSXtoLSJ(resource));
+                       
+
+                        string jsonText = ConvertXmlToJson(file);
+                        
+                        TagStructurRoot tagStructurRoot = JsonConvert.DeserializeObject<TagStructurRoot>((writer.LSXtoLSJ(resource)));
+
+                        string trimmedFilePath = file.Substring(0, file.LastIndexOf('.')).Replace(tagPath + "\\", "");
+                        tagData[trimmedFilePath] = tagStructurRoot;
+                        if (tagStructurRoot.save.regions.RegTags != null)
+                        {
+                            tagData[tagStructurRoot.save.regions.RegTags.UUID.Value] = tagStructurRoot;
+                        }
+                        else
+                        {
+                            tagData[tagStructurRoot.save.regions.RegFlags.UUID.Value] = tagStructurRoot;
+                        }
+                        
+                    }
+                }
+                string json = JsonConvert.SerializeObject(tagData);
+                System.IO.File.WriteAllText("mergedTags.txt", json);
+            }catch  (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());   
             }
+
         }
 
         private string ConvertXmlToJson(string filePath)
         {
             XmlDocument doc = new XmlDocument();
             doc.Load(filePath);
+            
             return JsonConvert.SerializeXmlNode(doc);
         }
 
@@ -653,7 +721,7 @@ namespace BGEdit
         {
             try
             {
-                using (StreamWriter writer = File.AppendText(fileName))
+                using (StreamWriter writer = System.IO.File.AppendText(fileName))
                 {
                     writer.Write(text);
                 }
@@ -664,13 +732,7 @@ namespace BGEdit
             }
         }
 
-        private void UpdateAttributes(BGEdit.TagStructur.TagStructurRoot tagStructurRoot)
-        {
-            foreach (var item in tagStructurRoot.Save.Region.Node.Attribute)
-            {
-                tagStructurRoot.attributes[item.Id] = item;
-            }
-        }
+       
         public void LoadLocalization(String path)
         {
             XmlDocument doc = new XmlDocument();
@@ -693,7 +755,7 @@ namespace BGEdit
             XmlDocument doc = new XmlDocument();
             doc.Load(path);
             string jsonText = JsonConvert.SerializeXmlNode(doc);
-            var SpeakerGroupsStructurRoot = JsonConvert.DeserializeObject<BGEdit.SpeakerGroupsStructur.SpeakerGroupsStructurRoot>(jsonText); 
+            var SpeakerGroupsStructurRoot = JsonConvert.DeserializeObject<SpeakerGroupsStructurRoot>(jsonText); 
             foreach (var item in SpeakerGroupsStructurRoot.Save.Region.Node.Children.Node)
             {
                 //item.Attribute[0].Value == UUID of attribute
@@ -729,7 +791,6 @@ namespace BGEdit
             catch (JsonSerializationException ex)
             {
                 Console.WriteLine(ex.Message);
-                // Could not find member 'DeletedDate' on object of type 'Account'. Path 'DeletedDate', line 4, position 23.
             }*/
           
         }
@@ -766,7 +827,7 @@ namespace BGEdit
             string jsonText = JsonConvert.SerializeXmlNode(doc);
            
             var myDeserializedClass = JsonConvert.DeserializeObject<BGEdit.MergedCharsStructure.Root>(jsonText);
-            // Console.WriteLine("Found Amount of merged nodes in: "+ myDeserializedClass.Save.Region.Node.Children.Node.Length);
+            // Console.WriteLine("Found amount of merged nodes in: "+ myDeserializedClass.Save.Region.Node.Children.Node.Length);
             foreach (var item in myDeserializedClass.save.region.node.children.node)
             {
                 foreach (var item2 in item.attribute)
@@ -793,8 +854,8 @@ namespace BGEdit
             XmlDocument doc = new XmlDocument();
             doc.Load(path);
             string jsonText = JsonConvert.SerializeXmlNode(doc);
-            var myDeserializedClass = JsonConvert.DeserializeObject<BGEdit.OriginStructur.Root>(jsonText);
-            foreach (var item in myDeserializedClass.save.region.node.children.node)
+            var origins = JsonConvert.DeserializeObject<BGEdit.OriginStructur.Root>(jsonText);
+            foreach (var item in origins.save.region.node.children.node)
             {
                 foreach (var item2 in item.attribute)
                 {
@@ -898,7 +959,7 @@ namespace BGEdit
                     }
                    
                 }
-                //serializeData();
+                Console.Write("loading done");
 
 
             }
@@ -1005,7 +1066,6 @@ namespace BGEdit
             }
            
         }
-        //todo
         public void RemoveNodeInData(NodeNode from)
         {
             foreach (var item in from.children)
@@ -1042,12 +1102,46 @@ namespace BGEdit
                 }
             }
         }
+        
+        /*todo
+        private List<SearchResultData> SearchRecursion<T>(String query, List<SearchResultData> searchResultData, SearchType searchType,List<T> toSearch)
+        {
+
+            /*var type = toSearch.GetType().GetGenericArguments()[0];
+            var properties = type.GetProperties();
+            var result = toSearch.Any(x => properties
+                        .Any(p =>
+                        {
+                            var value = p.GetValue(x);
+                            if ()
+                            {
+
+                            }
+                            return value != null && value.ToString().Contains(query);
+                        }));
+            foreach (var item in toSearch)
+            {
+
+            }
+            return searchResultData;
+
+        }
+
+        public List<SearchResultData> Search(String query, SearchType searchType,List<SearchLocation> searchLocations)
+        {
+            List<SearchResultData> results = new List<SearchResultData>();
+            foreach (var searchLocation in searchLocations) { 
+            
+            }
+            return results;
+        }
+         */
         public ICommand Save { get; set; } = new DelegateCommand(() =>
         {
             Console.WriteLine("Save");
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             if (saveFileDialog.ShowDialog() == true)
-                File.WriteAllText(saveFileDialog.FileName, BGData.Instance.SerializeData());
+                System.IO.File.WriteAllText(saveFileDialog.FileName, BGData.Instance.SerializeData());
         });
         public ICommand CopyToClip { get; set; } = new DelegateCommand(() =>
         {
