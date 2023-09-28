@@ -19,6 +19,10 @@ namespace BGEdit
             window = this;
         }
 
+        public void Node_Selected(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("Selected");
+        }
     }
     public interface INodifyCommand : ICommand
     {

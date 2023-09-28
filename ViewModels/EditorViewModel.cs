@@ -1,4 +1,5 @@
-﻿using Nodify;
+﻿using BGEdit.TagStructur;
+using Nodify;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +11,6 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-
 namespace BGEdit
 {
 
@@ -26,36 +26,47 @@ namespace BGEdit
         private Dictionary<ConnectorViewModel, List<ConnectorViewModel>> ToConnect { get; set; } = new Dictionary<ConnectorViewModel, List<ConnectorViewModel>>();
         private List<ConnectionViewModel> JumpConnections { get; set; } =new List<ConnectionViewModel>();
         public event PropertyChangedEventHandler? PropertyChanged;
-
+        private void Node_Selected(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("Selected");
+        }
         public ICommand DisconnectConnectorCommand { get; }
         public ICommand JumpToNode { get; set; } = new DelegateCommand(() =>
         {
-            Console.WriteLine("Jump node default");
-            instance.ViewportLocation = EditorViewModel.instance.CurrentNodeViewModel.Location;
+            //Console.WriteLine("Jump node default");
+            Instance.ViewportZoom = 1.0d;
+            Instance.ViewportLocation = EditorViewModel.Instance.CurrentNodeViewModel.Location;
+           
         });
         public ICommand ToggleJump { get; set; } = new DelegateCommand(() =>
         {
-            Console.WriteLine("ToggleJump node default");
-            if(EditorViewModel.instance.JumpConnections.Count == 0)
+            //Console.WriteLine("ToggleJump node default");
+            if(EditorViewModel.Instance.JumpConnections.Count == 0)
             {
                 foreach (var item in BGData.Instance.dialogeDictionary.Keys)
                 {
-                    EditorViewModel.instance.ConnectJumptargets(item);
+                    EditorViewModel.Instance.ConnectJumptargets(item);
                 }
             }
             else
             {
-                foreach (var jcon in EditorViewModel.instance.JumpConnections)
+                foreach (var jcon in EditorViewModel.Instance.JumpConnections)
                 {
-                    EditorViewModel.instance.Connections.Remove(jcon);
+                    EditorViewModel.Instance.Connections.Remove(jcon);
                 }
-                EditorViewModel.instance.JumpConnections.Clear();
+                EditorViewModel.Instance.JumpConnections.Clear();
 
             }
-            
-           
+             
         });
+      
+        public ICommand OpenPopup_Flag { get; set; } = new DelegateCommand(() =>
+        {
+            TagPopupWindow popup = new();
+            //SearchWindow popup = new ();
+            popup.ShowDialog();
 
+        });
         private NodeViewModel _CurrentNodeViewModel;
         public NodeViewModel CurrentNodeViewModel
         {
@@ -77,12 +88,21 @@ namespace BGEdit
             }
             get => _viewPortLocation;
         }
-
+        private Double _viewportZoom = 1.0d;
+        public Double ViewportZoom
+        {
+            set
+            {
+                _viewportZoom = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ViewportZoom)));
+            }
+            get => _viewportZoom;
+        }
         private BGData bgData = BGData.Instance;
         private bool startUp = true;
 
         private static EditorViewModel? _instance;
-        public static EditorViewModel instance
+        public static EditorViewModel Instance
         {
             set
             {
@@ -112,7 +132,7 @@ namespace BGEdit
             //Connections are a bit much to view
             //addSpeakerNodes(bgData, bgData.currentContext.currentDialogeNodeUUID);
             startUp = false;
-            instance= this;
+            Instance= this;
         }
         public void ConnectNodes()
         {
@@ -170,9 +190,10 @@ namespace BGEdit
             }
 
         }
-
         private void ConnectJumptargets(string key)
         {
+            //Workaround to prevent editing children of the node
+            startUp = true;
             foreach (NodeNode node in bgData.dialogeDictionary[key].Save.Regions.Dialog.Nodes[0].Node)
             {
                 if (node.Jumptarget != null && AddedNodes.ContainsKey(node.Uuid.Value) && AddedNodes.ContainsKey(node.Jumptarget.value))
@@ -180,8 +201,8 @@ namespace BGEdit
                     JumpConnections.Add(Connect(AddedNodes[node.Uuid.Value].Output[0], AddedNodes[node.Jumptarget.value].Input[0], new SolidColorBrush(Colors.PeachPuff)));
                 }
             }
+            startUp = false;
         }
-
         private void ForEachNodeInDDict(string key, NodeViewModel SpeakerRootNode, RootNode item, NodeViewModel tmpNode)
         {
             foreach (NodeNode node in bgData.dialogeDictionary[key].Save.Regions.Dialog.Nodes[0].Node)
@@ -233,7 +254,6 @@ namespace BGEdit
             AddTaggedText(node, bgData, hasTagRule, tagCombineType, tagCombineValue, lineUUIDNumber, localisationUUID, isStub);
             bgData.tagedTextAdd.TryAdd(node.Uuid.Value, "True");
         }
-
         private void ProcessRules(TaggedTextTaggedText tag, List<string> tagTextToAdd)
         {
             if (!tag.HasTagRule.Value) return;
@@ -265,7 +285,6 @@ namespace BGEdit
                 }
             }
         }
-
         private void ProcessTagTexts(TaggedTextTaggedText tag, List<string> tagTextToAdd, ref string lineUUIDNumber, ref string localisationUUID, ref bool isStub)
         {
             foreach (var tagText in tag.TagTexts)
@@ -286,8 +305,7 @@ namespace BGEdit
                     }
                 }
             }
-        }
-       
+        }    
         public void AddSpeakersToNode(NodeNode node)
         {
             String nodeUUID = node.Uuid.Value;
@@ -321,7 +339,6 @@ namespace BGEdit
                 }*/
             }
         }
-
         public void AddCheckFlags(NodeNode node)
         {
             ProcessCheckFlags(node);
@@ -348,7 +365,18 @@ namespace BGEdit
                             String nodeUUID = node.Uuid.Value;
                             if (bgData.tagData.ContainsKey(item3UUIDValue) && !(bgData.beenTagged.ContainsKey(nodeUUID)))
                             {
-                                String tmp ="Set Flag: " + bgData.tagData[item3UUIDValue].attributes["Description"].Value + ": " + item3.value.Value;
+                                //String tmp ="Set Flag: " + bgData.tagData[item3UUIDValue].save.regions.RegTags.Description.Value + ": " + item3.value.Value;
+                                String tmp = "";
+                                /*if (bgData.tagData[item3UUIDValue].save.regions.RegTags != null)
+                                {
+                                    tmp = "Set Tag: " + bgData.tagData[item3UUIDValue].save.regions.RegTags.Description.Value + ": " + item3.value.Value;
+                                }
+                                else
+                                {
+                                    tmp = "Set Flags: " + bgData.tagData[item3UUIDValue].save.regions.RegFlags.Description.Value + ": " + item3.value.Value;
+
+                                }*/
+                                tmp = "Set: "+bgData.getTagData(item3UUIDValue);
                                 GenericNodeActions.AddTextToNode(AddedNodes[nodeUUID].TagSetList, SplitStringAtWhitespace(tmp,128));
                                 AddedNodes[nodeUUID].TagsToSetFound = "Visible";
                             }
@@ -363,7 +391,6 @@ namespace BGEdit
                 }
             }
         }
-
         private void ProcessCheckFlags(NodeNode node)
         {
             if (node?.Checkflags == null) return;
@@ -380,7 +407,18 @@ namespace BGEdit
                            
                             if (bgData.tagData.ContainsKey(item3UUIDValue) && !(bgData.beenTagged.ContainsKey(nodeUUID)))
                             {
-                                String tmp = "Check Flag: "+ bgData.tagData[item3UUIDValue].attributes["Description"].Value + ": " + item3.value.Value;
+                                String tmp = "";
+                                /*if (bgData.tagData[item3UUIDValue].save.regions.RegTags != null)
+                                 {
+                                     tmp = "Check Tag: " + bgData.tagData[item3UUIDValue].save.regions.RegTags.Description.Value + ": " + item3.value.Value;
+                                 }
+                                 else
+                                 {
+                                     tmp = "Check Flags: " + bgData.tagData[item3UUIDValue].save.regions.RegFlags.Description.Value + ": " + item3.value.Value;
+
+                                 }*/
+                                tmp = "Check: "+bgData.getTagData(item3UUIDValue);
+
                                 GenericNodeActions.AddTextToNode(AddedNodes[nodeUUID].TagList,SplitStringAtWhitespace(tmp,128));
                                 AddedNodes[nodeUUID].TagsFound = "Visible";
 
@@ -559,7 +597,6 @@ namespace BGEdit
                 }
             }
         }
-
         private Dictionary<String, String> keyValOld = new Dictionary<String, String>();
         public void AddEditorData(NodeNode node, bool newFlag = true, String keyValText="",String valTypeText="", String valValueText="")
         {
@@ -895,7 +932,6 @@ namespace BGEdit
             SetCurrentNodeView(node);
 
         }
-
         //Small workaround
         private void SetCurrentNodeView(NodeNode node)
         {
@@ -927,7 +963,7 @@ namespace BGEdit
                 }
             }
         }
-
+      
         private void EditorViewModel_PropertyChangedType(object? sender, PropertyChangedEventArgs e)
         {
             if (!startUp) {
@@ -1033,7 +1069,7 @@ namespace BGEdit
 
             }
         }
-        public ConnectionViewModel Connect(ConnectorViewModel source, ConnectorViewModel target, Brush? brush = null, ConnectionViewModel.ConnectionType connectionType = 0)
+        public ConnectionViewModel? Connect(ConnectorViewModel source, ConnectorViewModel target, Brush? brush = null, ConnectionViewModel.ConnectionType connectionType = 0)
         {
             var connection = new ConnectionViewModel(source, target, connectionType)
             {

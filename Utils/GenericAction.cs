@@ -119,5 +119,10 @@ namespace BGEdit
 
             return new Point(x, y);
         }
+
+        public static Point MultiplyPoint(Point point,double value)
+        {
+            return new Point(point.X* value, point.Y* value);
+        }
     }
 }

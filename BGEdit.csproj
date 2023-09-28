@@ -14,8 +14,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AlphaFS" Version="2.2.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Nodify" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="LSLib">
+      <HintPath>LSLib\LSLib.dll</HintPath>
+    </Reference>
+    <Reference Include="LSLibNative">
+      <HintPath>LSLib\LSLibNative.dll</HintPath>
+    </Reference>
+    <Reference Include="LZ4">
+      <HintPath>LSLib\LZ4.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

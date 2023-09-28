@@ -1,0 +1,145 @@
+﻿<Window x:Class="BGEdit.TagPopupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BGEdit"
+        mc:Ignorable="d"
+        Title="Tag-Window" Height="450" Width="800">
+
+    <Grid>
+        <Grid.DataContext>
+            <local:TagPopupWindowViewModel/>
+        </Grid.DataContext>
+        <TabControl>
+            <TabItem Header="Edit Flags" Margin="-2,-2,-2,0">
+                <Grid Background="#FFE5E5E5">
+                    <Grid/>
+                    <Border BorderBrush="Black" BorderThickness="1" Margin="192,19,17,25">
+                        <Grid Margin="0,0,0,9">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="294*"/>
+                                <ColumnDefinition Width="289*"/>
+                            </Grid.ColumnDefinitions>
+                            <ListView ItemsSource="{Binding DisplayedData}" Margin="10,10,10,199" Grid.ColumnSpan="2" SelectedIndex="{Binding SelectedIndexFlag}">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridView.Columns>
+                                            <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
+                                            <GridViewColumn Header="Description" DisplayMemberBinding="{Binding Description}" />
+                                            <GridViewColumn Header="UUID" DisplayMemberBinding="{Binding UUID}" />
+                                        </GridView.Columns>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                            <ListView ItemsSource="{Binding DisplayAddedTags}" Margin="10,0,10,22" Grid.ColumnSpan="2" Height="127" VerticalAlignment="Bottom" SelectedIndex="{Binding SelectedIndexAddedFlag}" >
+                                <ListView.View>
+                                    <GridView>
+                                        <GridView.Columns>
+                                            <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
+                                            <GridViewColumn Header="Description" DisplayMemberBinding="{Binding Description}" />
+                                            <GridViewColumn Header="UUID" DisplayMemberBinding="{Binding UUID}" />
+                                            <GridViewColumn Header="CheckOrSet">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+
+                                                        <ComboBox SelectedIndex="{Binding SelectedComboSetCheck}">
+                                                            <ComboBoxItem >Check</ComboBoxItem>
+                                                            <ComboBoxItem>Set</ComboBoxItem>
+                                                        </ComboBox>
+
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" />
+                                            <!-- <GridViewColumn Header="Value" DisplayMemberBinding="{Binding Value}" /> -->
+                                            <GridViewColumn Header="Condition">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+
+                                                        <CheckBox HorizontalAlignment="Center" IsChecked="{Binding Condition}"/>
+
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                        </GridView.Columns>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                            <Button Content="🡻" Margin="237,0,0,165" Command="{Binding DownArrow}" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="17" />
+                            <Button Content="🡹" Margin="13,0,0,165" RenderTransformOrigin="0,0.104"  Command="{Binding UpArrow}" Grid.Column="1" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="17"/>
+                        </Grid>
+                    </Border>
+                    <ListBox ItemsSource="{Binding FlagTypes}" Margin="10,30,0,184" HorizontalAlignment="Left" Width="152" SelectedIndex="{Binding SelectedIndexFlagType}"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,14,0,0" TextWrapping="Wrap" Text="Flag Categories:" VerticalAlignment="Top"/>
+                    <!--<Button Content="OK" Margin="682,0,0,3" Command="{Binding OK}" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="20"/>
+                    <Button Content="Cancel" Margin="0,0,28,3" Command="{Binding Chancel}" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="39"/> -->
+                </Grid>
+            </TabItem>
+            <TabItem Header="Dialog variables" Margin="-2,-2,-2,0" IsEnabled="False"  Visibility="Hidden">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="206*"/>
+                        <RowDefinition Height="197*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.RowSpan="2"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Filter:" VerticalAlignment="Top"/>
+                    <TextBox Margin="44,8,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
+                    <TextBlock Margin="10,31,757,0" TextWrapping="Wrap" Text="Mod:" Height="15" VerticalAlignment="Top"/>
+                    <ComboBox Margin="44,28,0,0" Height="18" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
+                    <ListBox d:ItemsSource="{d:SampleData ItemCount=5}" Margin="10,52,0,42" Grid.RowSpan="2" HorizontalAlignment="Left" Width="154"/>
+                    <Button Content="Create" Margin="52,0,0,17" Grid.Row="1" Height="19" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="52"/>
+                    <Button Content="Delete" Margin="109,0,0,17" Grid.Row="1" HorizontalAlignment="Left" Width="55" Height="19" VerticalAlignment="Bottom"/>
+                    <TextBox Margin="247,54,82,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top"/>
+                    <TextBox Margin="247,78,82,0" TextWrapping="Wrap" Text="TextBox" Height="17" VerticalAlignment="Top"/>
+                    <TextBox Margin="247,101,82,0" TextWrapping="Wrap" Text="TextBox" Height="17" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="178,56,0,0" TextWrapping="Wrap" Text="UUID:" Height="15" VerticalAlignment="Top"/>
+                    <TextBox Margin="248,188,81,0" TextWrapping="Wrap" Text="TextBox" Height="17" VerticalAlignment="Top"/>
+                    <TextBox Margin="248,148,81,0" TextWrapping="Wrap" Text="TextBox" Height="17" VerticalAlignment="Top" />
+                    <TextBlock HorizontalAlignment="Left" Margin="178,80,0,0" TextWrapping="Wrap" Text="Name:" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="178,101,0,0" TextWrapping="Wrap" Text="Description:" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="178,125,0,0" TextWrapping="Wrap" Text="Type:" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="178,148,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="16" Text="Default:" Width="79"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="178,188,0,0" TextWrapping="Wrap" Text="Filepath:" VerticalAlignment="Top"/>
+                    <Button Content="Save" Margin="0,0,126,16" Grid.Row="1" HorizontalAlignment="Right" Width="40" Height="20" VerticalAlignment="Bottom"/>
+                    <Button Content="Cancel" Margin="0,0,82,16"  RenderTransformOrigin="1.152,0.253" Grid.Row="1" HorizontalAlignment="Right" Width="39" Height="20" VerticalAlignment="Bottom"/>
+                    <ComboBox HorizontalAlignment="Left" Margin="247,125,0,0" VerticalAlignment="Top" Width="465" Height="18"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="212,41,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Height="15"><Run Text="Default Value:"/><LineBreak/><Run/></TextBlock>
+                    <TextBlock HorizontalAlignment="Left" Margin="178,170,0,0" TextWrapping="Wrap" Text="Defined in:" VerticalAlignment="Top"/>
+                    <ComboBox HorizontalAlignment="Left" Margin="248,170,0,0" VerticalAlignment="Top" Width="464" Height="16" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Edit script flags" Margin="-2,0,-2,0"  IsEnabled="False" Visibility="Hidden">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="206*"/>
+                        <RowDefinition Height="197*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.RowSpan="2"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Filter:" VerticalAlignment="Top"/>
+                    <TextBox Margin="44,8,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
+                    <TextBlock Margin="10,31,757,0" TextWrapping="Wrap" Text="Mod:" Height="15" VerticalAlignment="Top"/>
+                    <ComboBox Margin="44,28,0,0" Height="18" VerticalAlignment="Top" HorizontalAlignment="Left" Width="120"/>
+                    <ListBox d:ItemsSource="{d:SampleData ItemCount=5}" Margin="10,52,0,42" Grid.RowSpan="2" HorizontalAlignment="Left" Width="154"/>
+                    <Button Content="Create" Margin="52,0,0,17" Grid.Row="1" Height="19" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="52"/>
+                    <Button Content="Delete" Margin="109,0,0,17" Grid.Row="1" HorizontalAlignment="Left" Width="55" Height="19" VerticalAlignment="Bottom"/>
+                    <TextBox Margin="247,54,82,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top"/>
+                    <TextBox Margin="247,78,82,0" TextWrapping="Wrap" Text="TextBox" Height="17" VerticalAlignment="Top"/>
+                    <TextBox Margin="247,101,82,0" TextWrapping="Wrap" Text="TextBox" Height="17" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="178,56,0,0" TextWrapping="Wrap" Text="UUID:" Height="15" VerticalAlignment="Top"/>
+                    <TextBox Margin="247,124,82,0" TextWrapping="Wrap" Text="TextBox" Height="17" VerticalAlignment="Top"/>
+                    <TextBox Margin="247,147,82,0" TextWrapping="Wrap" Text="TextBox" Height="17" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="178,80,0,0" TextWrapping="Wrap" Text="Name:" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="178,101,0,0" TextWrapping="Wrap" Text="Description:" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="178,125,0,0" TextWrapping="Wrap" Text="Defined in:" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="178,148,0,0" TextWrapping="Wrap" Text="Filepath:" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="178,177,0,0" TextWrapping="Wrap" Text="Script:" VerticalAlignment="Top"/>
+                    <TextBox Margin="247,177,82,42" TextWrapping="Wrap" Text="TextBox" Grid.RowSpan="2"/>
+                    <Button Content="Save" Margin="0,0,126,16" Grid.Row="1" HorizontalAlignment="Right" Width="40" Height="20" VerticalAlignment="Bottom"/>
+                    <Button Content="Cancel" Margin="0,0,82,16"  RenderTransformOrigin="1.152,0.253" Grid.Row="1" HorizontalAlignment="Right" Width="39" Height="20" VerticalAlignment="Bottom"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Window>

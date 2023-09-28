@@ -34,20 +34,22 @@ UnpackedData/
 4. Run the .exe, or compile the code yourself
 5. Controls: Zoom with the mousewheel, drag with mouse, "copy to clipboard"/"save"-Button
 6. Limited edits should be possible<br> (For selecting the current node in the UI, you need to move it)
+7. The popup window currently doesn't allow editing certain values.
 
 | BGDView  | NP++ |
 | ------------- | ------------- |
 |![UI](https://github.com/gidHog/BGDView/assets/64482285/e16e58ec-84f0-41f9-b072-5989e18bbd12) | ![NodeExample2](https://github.com/gidHog/BGDView/assets/64482285/e1b38f18-22f5-4aaa-b143-d7eb4e4a9b34)  |
-
+![TagWindow](https://github.com/gidHog/BGDView/assets/64482285/d4403cc0-e4d1-4bce-ae61-771e6a5b4d91)
 ---
+
 # <span style="color:red">Disclaimer</span>
 
 1. This is a early and incomplete version, things may not work or be displayed incorrect
    - Not everything is displayed
    - Not everything is editable
    - Currently you need to move the node to display it in the UI
-3. Loading takes longer with Windows-Defender enabled (M.2 SSD: ~10 vs ~100+ seconds)
-4. The code is kinda messy
+3. Loading takes longer with Windows-Defender enabled (M.2 SSD: ~10 vs ~100+ seconds) -> The option for merged flags/tags should be used.
+5. The code is kinda messy
 
 
 
