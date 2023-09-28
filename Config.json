@@ -1,0 +1,34 @@
+{
+	"config":{
+		"RootFolder": {"path" : "UnpackedData"},
+		"UseMergedFlags": {"type" : "bool", "value" : true},
+		"RelativeDialoguePath" : {"path" : "\\Gustav\\Mods\\Gustav\\Story\\Dialogs\\Camp\\CAMP_Jergal.lsj"},
+		"RelativeLocalizationPath": {"path" : "English\\Localization\\English\\english.xml"},
+		"RelativeSpeakerGroupsPath": [
+			{"Path" : "Gustav\\Public\\GustavDev\\Voice\\SpeakerGroups.lsx"},
+			{"Path" : "Gustav\\Public\\Gustav\\Voice\\SpeakerGroups.lsx"},
+			{"Path" : "Shared\\Public\\Shared\\Voice\\SpeakerGroups.lsx"},
+			{"Path" : "Shared\\Public\\SharedDev\\Voice\\SpeakerGroups.lsx"}
+		],
+		"RelativeOriginsPath":{"path" : "Gustav\\Public\\GustavDev\\Origins\\Origins.lsx"},
+		"RelativeflagPaths" : [
+			{"Path" : "Shared\\Public\\Shared\\Tags"},
+			{"Path" : "Gustav\\Public\\Gustav\\Tags"},
+			{"Path" : "Gustav\\Public\\GustavDev\\Tags"},
+			{"Path" : "Gustav\\Public\\GustavDev\\Flags"},
+			{"Path" : "Gustav\\Public\\Gustav\\Flags"},
+			{"Path" : "Shared\\Public\\SharedDev\\Tags"},
+			{"Path" : "Shared\\Public\\SharedDev\\Flags"},
+			{"Path" : "Shared\\Public\\Shared\\Tags"},
+			{"Path" : "Shared\\Public\\Shared\\Flags"}
+		],
+		"RelativeMergedPaths" : [
+			{"Path" : "Gustav\\Mods\\GustavDev\\Levels\\END_Main\\Characters\\_merged.lsx"},
+			{"Path" : "Gustav\\Mods\\GustavDev\\Globals\\SCL_Main_A\\Characters\\_merged.lsx"},
+			{"Path" : "Gustav\\Mods\\Gustav\\Globals\\WLD_Main_A\\Characters\\_merged.lsx"}
+		]
+	}
+	
+}
+
+
