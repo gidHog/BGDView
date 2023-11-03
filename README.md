@@ -1,5 +1,5 @@
 # How to
-1. Extract all data with [BG3-Modders-Multitool](https://github.com/ShinyHobo/BG3-Modders-Multitool/releases) (unpack,decompress if your using a newer version i might be nedded to change the file ending (lsf.lsx -> .lsx ...))
+1. Extract all data with [BG3-Modders-Multitool](https://github.com/ShinyHobo/BG3-Modders-Multitool/releases)(unpack and decompress). If you are using a newer version, you might need to change the file extension (e.g., from .lsf to .lsx).
 2. The following folder structure is needed ("UnpackedData" name and path can be changed in the config):
 ```
 BGEdit.exe
